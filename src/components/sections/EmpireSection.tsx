@@ -35,18 +35,18 @@ export const EmpireSection = () => {
         </h2>
         
         <p className={`text-lg md:text-xl text-gray-500 font-medium max-w-2xl mb-12 md:mb-16 transition-all duration-700 delay-100 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-          Join the forward-thinking product teams who stopped guessing and started building with evidence. Setup takes under 10 minutes.
+          The era of guessing is over. Join the product teams building with evidence. Setup takes under 10 minutes.
         </p>
 
         <div className={`flex flex-col sm:flex-row gap-4 md:gap-6 mb-24 md:mb-32 w-full sm:w-auto transition-all duration-700 delay-150 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           <MagneticButton strength={0.2} className="w-full sm:w-auto">
-            <Link to="/signup" className="w-full sm:w-auto inline-block bg-gray-900 text-white px-10 md:px-12 py-4 md:py-5 rounded-full font-bold text-base md:text-lg hover:bg-brand-blue transition-all duration-300 shadow-apple btn-shine focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-blue focus-visible:ring-offset-2">
+            <Link to="/signup" className="w-full sm:w-auto inline-block bg-gray-900 border border-gray-900 text-white px-10 md:px-12 py-4 md:py-5 rounded-full font-bold text-base md:text-lg hover:bg-brand-blue hover:border-brand-blue transition-all duration-300 shadow-apple btn-shine focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-blue focus-visible:ring-offset-2">
               Start Free
             </Link>
           </MagneticButton>
           <MagneticButton strength={0.1} className="w-full sm:w-auto">
-            <Link to="/signup?demo=true" className="w-full sm:w-auto inline-block bg-white text-gray-900 border border-gray-200 px-10 md:px-12 py-4 md:py-5 rounded-full font-bold text-base md:text-lg hover:bg-gray-50 transition-all duration-300 shadow-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-gray-300 focus-visible:ring-offset-2">
-              Book a Demo
+            <Link to="/#features" onClick={(e) => handleNavClick(e, '/#features')} className="relative w-full sm:w-auto inline-block bg-white text-gray-900 border border-gray-200 px-10 md:px-12 py-4 md:py-5 rounded-full font-bold text-base md:text-lg hover:bg-gray-50 transition-all duration-300 shadow-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-gray-300 focus-visible:ring-offset-2">
+              See the loop
             </Link>
           </MagneticButton>
         </div>
@@ -65,7 +65,7 @@ export const EmpireSection = () => {
               <div className="font-heading text-xl font-black tracking-tighter text-gray-900">ASTRIX</div>
             </Link>
             <p className="text-gray-500 text-sm font-medium max-w-xs mb-8 leading-relaxed">
-              The intelligence engine for B2B SaaS. Turn raw signals into evidence-backed product decisions.
+              The Accountability Layer for Product Teams. Stop guessing, start proving.
             </p>
             <div className="font-sans text-xs text-gray-400 font-medium">
               © 2026 Astrix AI Inc. All rights reserved.
@@ -81,11 +81,9 @@ export const EmpireSection = () => {
             </ul>
           </div>
 
-          {/* Company & Legal Column */}
           <div>
             <h4 className="font-bold text-gray-900 mb-6 font-heading">Company & Legal</h4>
             <ul className="space-y-4 text-sm text-gray-500 font-medium">
-              <li><Link to="/contact" className="hover:text-brand-blue transition-colors focus-visible:outline-none focus-visible:text-brand-blue">Contact Us</Link></li>
               <li><Link to="/privacy" className="hover:text-brand-blue transition-colors focus-visible:outline-none focus-visible:text-brand-blue">Privacy Policy</Link></li>
               <li><Link to="/terms" className="hover:text-brand-blue transition-colors focus-visible:outline-none focus-visible:text-brand-blue">Terms of Service</Link></li>
             </ul>

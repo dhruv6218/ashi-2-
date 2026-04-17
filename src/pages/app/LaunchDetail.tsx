@@ -79,8 +79,24 @@ export const LaunchDetail = () => {
             <h2 className="font-heading text-2xl font-black text-gray-900 mb-3">{launch.title}</h2>
             <div className="flex flex-wrap items-center gap-4 text-sm font-mono text-gray-500">
               <span className="flex items-center gap-1.5"><Rocket className="w-4 h-4" /> Launched {new Date(launch.launched_at).toLocaleDateString()}</span>
-              <span className="flex items-center gap-1.5"><Clock className="w-4 h-4" /> Tracking active</span>
+              <span className="flex items-center gap-1.5"><Clock className="w-4 h-4" /> Day 14 of 30 tracking window</span>
             </div>
+          </div>
+          <div className="flex gap-4">
+             <div className="text-right">
+                <div className="text-[10px] font-mono font-bold text-gray-400 uppercase">Review Status</div>
+                <div className="flex items-center gap-2 mt-1">
+                   <div className="w-3 h-3 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
+                   <span className="text-sm font-bold text-gray-900">Day 7 Passed</span>
+                </div>
+             </div>
+             <div className="text-right">
+                <div className="text-[10px] font-mono font-bold text-gray-400 uppercase">Next Milestone</div>
+                <div className="flex items-center gap-2 mt-1 text-gray-400">
+                   <div className="w-3 h-3 rounded-full bg-gray-200"></div>
+                   <span className="text-sm font-bold">Day 30 Review</span>
+                </div>
+             </div>
           </div>
         </div>
       </div>
@@ -125,18 +141,17 @@ export const LaunchDetail = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">Final Verdict</label>
-                <select 
+                <label className="block text-sm font-bold text-gray-700 mb-2 whitespace-nowrap">
+                   PM Verdict (Day 7 Review) <span className="text-red-500">*</span>
+                </label>
+                <textarea 
+                  required
                   value={formData.pm_verdict} 
                   onChange={e => setFormData({ ...formData, pm_verdict: e.target.value })} 
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-astrix-teal"
-                >
-                  <option value="">Select verdict...</option>
-                  <option value="Solved">✅ Solved</option>
-                  <option value="Partially Solved">⚠️ Partially Solved</option>
-                  <option value="Not Solved">❌ Not Solved</option>
-                  <option value="Regressed">🚨 Regressed</option>
-                </select>
+                  placeholder="Record your initial verdict on if this launch solved the problem..."
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-astrix-teal min-h-[100px] resize-none font-medium" 
+                />
+                <p className="text-[10px] text-gray-400 mt-2 font-medium italic">Self-accountability: This verdict will be permanently linked to this decision artifact.</p>
               </div>
 
               <div>

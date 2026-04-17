@@ -24,7 +24,6 @@ export const ArtifactStudio = () => {
   
   const [isGenerating, setIsGenerating] = useState(false);
   const [loadingStage, setLoadingStage] = useState('');
-  const [isPushingJira, setIsPushingJira] = useState(false);
   
   // Streaming AI State
   const [isTyping, setIsTyping] = useState(false);
@@ -98,14 +97,6 @@ export const ArtifactStudio = () => {
     setIsTyping(true);
     setDisplayedContent('');
     addToast('Artifact generated successfully', 'success');
-  };
-
-  const handlePushToJira = () => {
-    setIsPushingJira(true);
-    setTimeout(() => {
-      setIsPushingJira(false);
-      addToast('Successfully pushed to Jira Epic AST-123', 'success');
-    }, 1500);
   };
 
   const formatDate = (iso: string) => new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -201,14 +192,11 @@ export const ArtifactStudio = () => {
                     </>
                   ) : (
                     <>
-                      <button onClick={handlePushToJira} disabled={isPushingJira || isTyping} className="text-xs font-bold bg-[#0052CC] text-white px-3 py-1.5 rounded-lg flex items-center gap-1 shadow-sm hover:bg-blue-700 disabled:opacity-50">
-                        <Send className="w-3 h-3" /> {isPushingJira ? 'Pushing...' : 'Push to Jira'}
-                      </button>
-                      <button onClick={handleCopy} disabled={isTyping} title="Copy markdown" className="p-1.5 text-gray-500 hover:text-gray-900 bg-white border border-gray-200 rounded-lg shadow-sm disabled:opacity-50"><Copy className="w-3.5 h-3.5" /></button>
-                      <button onClick={() => { setEditContent(selectedArtifact.content); setIsEditing(true); }} disabled={isTyping} className="text-xs font-bold bg-white border border-gray-200 text-gray-700 px-3 py-1.5 rounded-lg flex items-center gap-1 shadow-sm hover:bg-gray-50 disabled:opacity-50">
-                        <Edit2 className="w-3 h-3" /> Edit
-                      </button>
-                    </>
+                    <button onClick={handleCopy} disabled={isTyping} title="Copy markdown" className="p-1.5 text-gray-500 hover:text-gray-900 bg-white border border-gray-200 rounded-lg shadow-sm disabled:opacity-50"><Copy className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => { setEditContent(selectedArtifact.content); setIsEditing(true); }} disabled={isTyping} className="text-xs font-bold bg-white border border-gray-200 text-gray-700 px-3 py-1.5 rounded-lg flex items-center gap-1 shadow-sm hover:bg-gray-50 disabled:opacity-50">
+                      <Edit2 className="w-3 h-3" /> Edit
+                    </button>
+                  </>
                   )}
                 </div>
               </div>

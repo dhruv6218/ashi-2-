@@ -15,9 +15,10 @@ export const MOCK_WORKSPACE = {
 };
 
 export const MOCK_ACCOUNTS = [
-  { id: 'acc-1', workspace_id: 'ws-1', name: 'CloudScale Inc', domain: 'cloudscale.com', arr: 1200000, plan: 'Enterprise', health_score: 'Low', signal_count: 12, last_signal_date: new Date().toISOString(), created_at: new Date().toISOString() },
-  { id: 'acc-2', workspace_id: 'ws-1', name: 'TechFlow', domain: 'techflow.io', arr: 840000, plan: 'Enterprise', health_score: 'Medium', signal_count: 8, last_signal_date: new Date().toISOString(), created_at: new Date().toISOString() },
-  { id: 'acc-3', workspace_id: 'ws-1', name: 'DataSync', domain: 'datasync.co', arr: 45000, plan: 'Pro', health_score: 'High', signal_count: 3, last_signal_date: new Date().toISOString(), created_at: new Date().toISOString() },
+  { id: 'acc-1', workspace_id: 'ws-1', name: 'CloudScale Inc', domain: 'cloudscale.com', arr: 1200000, plan: 'Enterprise', health_score: '84', signal_count: 12, last_signal_date: new Date(Date.now() - 2 * 86400000).toISOString(), created_at: new Date().toISOString() },
+  { id: 'acc-2', workspace_id: 'ws-1', name: 'TechFlow', domain: 'techflow.io', arr: 840000, plan: 'Enterprise', health_score: '42', signal_count: 8, last_signal_date: new Date(Date.now() - 5 * 86400000).toISOString(), created_at: new Date().toISOString() },
+  { id: 'acc-3', workspace_id: 'ws-1', name: 'DataSync', domain: 'datasync.co', arr: 45000, plan: 'Standard', health_score: '91', signal_count: 3, last_signal_date: new Date(Date.now() - 12 * 86400000).toISOString(), created_at: new Date().toISOString() },
+  { id: 'acc-4', workspace_id: 'ws-1', name: 'Loomis', domain: 'loomis.ai', arr: 250000, plan: 'Growth', health_score: '65', signal_count: 5, last_signal_date: new Date(Date.now() - 1 * 86400000).toISOString(), created_at: new Date().toISOString() },
 ];
 
 export const MOCK_PROBLEMS = [
@@ -52,8 +53,4 @@ export const MOCK_LAUNCHES = [
 
 export const MOCK_MEMBERS = [
   { id: 'mem-1', workspace_id: 'ws-1', user_id: 'user-1', role: 'admin', created_at: new Date().toISOString(), users: { full_name: 'Demo User', email: 'demo@astrix.ai' } }
-];
-
-export const MOCK_INTEGRATIONS = [
-  { id: 'int-1', workspace_id: 'ws-1', provider: 'jira', status: 'connected' as const, config: { defaultProjectId: 'PROJ-1', defaultIssueTypeId: '10001' }, updated_at: new Date().toISOString() }
 ];

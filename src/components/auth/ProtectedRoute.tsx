@@ -27,8 +27,8 @@ export const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ childr
     return <Navigate to="/onboarding/step-1" replace />;
   }
 
-  const isOnboardingRoute = location.pathname.startsWith('/onboarding');
-  if (isOnboardingRoute && workspaces.length > 0) {
+  const isOnboardingRoot = location.pathname === '/onboarding';
+  if (isOnboardingRoot && workspaces.length > 0) {
      return <Navigate to="/app" replace />;
   }
 

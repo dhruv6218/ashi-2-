@@ -14,6 +14,7 @@ interface AppLayoutProps {
   title: string;
   subtitle?: string;
   actions?: React.ReactNode;
+  backPath?: string;
 }
 
 export const AppLayout: React.FC<AppLayoutProps> = ({ children, title, subtitle, actions }) => {
@@ -184,6 +185,11 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, title, subtitle,
             >
               <Menu className="w-5 h-5" />
             </button>
+            {backPath && (
+              <Link to={backPath} className="p-2 -ml-2 text-gray-400 hover:text-gray-900 transition-colors">
+                <ChevronDown className="w-5 h-5 rotate-90" />
+              </Link>
+            )}
             <div className="hidden sm:block">
               <h1 className="font-heading text-xl font-bold text-gray-900 truncate">{title}</h1>
               {subtitle && <p className="text-xs text-gray-500 font-medium truncate">{subtitle}</p>}
@@ -191,6 +197,11 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, title, subtitle,
           </div>
           
           <div className="flex items-center gap-2 md:gap-4 shrink-0">
+            <div className="hidden lg:flex items-center bg-gray-100 border border-gray-200 rounded-lg px-3 py-1.5 cursor-pointer hover:bg-gray-200 transition-colors group">
+              <Search className="w-3.5 h-3.5 text-gray-400 mr-2 group-hover:text-gray-600" />
+              <span className="text-xs font-bold text-gray-400 group-hover:text-gray-600">Search signals...</span>
+              <kbd className="ml-4 px-1.5 py-0.5 rounded border border-gray-300 bg-white text-[10px] font-bold text-gray-400">⌘K</kbd>
+            </div>
             {actions && <div className="hidden sm:block">{actions}</div>}
             <div className="h-6 w-[1px] bg-gray-200 mx-1 md:mx-2 hidden sm:block"></div>
             <button className="text-gray-400 hover:text-gray-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-astrix-teal rounded-full p-1.5 md:p-1 relative">

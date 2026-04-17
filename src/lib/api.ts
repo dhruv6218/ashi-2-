@@ -52,12 +52,22 @@ export const api = {
       mockDb.signals = [newItem, ...mockDb.signals];
       triggerUpdate();
       return newItem;
+    },
+    get: async (id: string) => {
+      await delay();
+      const signal = mockDb.signals.find(s => s.id === id);
+      const account = signal?.account_id ? mockDb.accounts.find(a => a.id === signal.account_id) : null;
+      return { ...signal, accounts: account };
     }
   },
   accounts: {
     list: async (wsId: string, opts?: any) => {
       await delay(300);
       let res = mockDb.accounts.filter(a => a.workspace_id === wsId);
+      if (opts?.globalFilter) {
+        const q = opts.globalFilter.toLowerCase();
+        res = res.filter(a => a.name.toLowerCase().includes(q) || (a.domain && a.domain.toLowerCase().includes(q)));
+      }
       if (opts?.sorting?.length > 0) {
         const sort = opts.sorting[0];
         res.sort((a: any, b: any) => {
@@ -79,6 +89,13 @@ export const api = {
       mockDb.accounts = [newItem, ...mockDb.accounts];
       triggerUpdate();
       return newItem;
+    },
+    get: async (id: string) => {
+      await delay();
+      const account = mockDb.accounts.find(a => a.id === id);
+      const signals = mockDb.signals.filter(s => s.account_id === id);
+      const problems = mockDb.problems.filter(p => signals.some(s => s.normalized_text?.includes(p.title))); // Simple mock relation
+      return { account, signals, problems };
     }
   },
   problems: {
@@ -144,6 +161,10 @@ export const api = {
       await delay();
       mockDb.artifacts = mockDb.artifacts.map(a => a.id === id ? { ...a, ...data, updated_at: new Date().toISOString() } : a);
       triggerUpdate();
+    },
+    get: async (id: string) => {
+      await delay();
+      return mockDb.artifacts.find(a => a.id === id);
     }
   },
   launches: {
@@ -219,12 +240,28 @@ export const useSignals = (wsId?: string, opts?: any) => {
   return { data: data || { rows: [], total: 0 }, isLoading, refetch };
 };
 
+export const useSignal = (id?: string) => {
+  const { data, isLoading } = useQuery(async () => {
+    if (!id) return null;
+    return api.signals.get(id);
+  }, [id]);
+  return { data, isLoading };
+};
+
 export const useAccounts = (wsId?: string, opts?: any) => {
   const { data, isLoading, refetch } = useQuery(async () => {
     if (!wsId) return { rows: [], total: 0 };
     return api.accounts.list(wsId, opts);
   }, [wsId, JSON.stringify(opts)]);
   return { data: data || { rows: [], total: 0 }, isLoading, refetch };
+};
+
+export const useAccount = (id?: string) => {
+  const { data, isLoading } = useQuery(async () => {
+    if (!id) return null;
+    return api.accounts.get(id);
+  }, [id]);
+  return { data, isLoading };
 };
 
 export const useProblems = (wsId?: string) => {
@@ -281,6 +318,14 @@ export const useArtifacts = (wsId?: string) => {
     return api.artifacts.list(wsId);
   }, [wsId]);
   return { data: data || [], isLoading };
+};
+
+export const useArtifact = (id?: string) => {
+  const { data, isLoading } = useQuery(async () => {
+    if (!id) return null;
+    return api.artifacts.get(id);
+  }, [id]);
+  return { data, isLoading };
 };
 
 export const useLaunches = (wsId?: string) => {

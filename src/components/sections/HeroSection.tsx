@@ -25,21 +25,21 @@ export const HeroSection = () => {
         
         {/* Massive Editorial Typography */}
         <div className="relative w-full max-w-[1000px] mx-auto flex flex-col items-center justify-center mb-12 md:mb-16">
-          <h1 className="font-heading text-4xl sm:text-6xl md:text-7xl lg:text-[5.5rem] leading-[1.1] sm:leading-none tracking-tighter font-black text-gray-900 uppercase m-0 p-0 relative z-20 w-full">
+          <h1 className="font-heading text-4xl sm:text-6xl md:text-7xl lg:text-[5.5rem] leading-[1.1] sm:leading-none tracking-tighter font-black text-gray-900 m-0 p-0 relative z-20 w-full">
             <span className="block overflow-hidden pb-1 sm:pb-2">
               <span className={`block transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${isVisible ? 'translate-y-0' : 'translate-y-[120%]'}`}>
-                Your Product <br className="sm:hidden" /> Brain,
+                Turn customer signals
               </span>
             </span>
             <span className="block overflow-hidden pb-2 sm:pb-4">
               <span className={`block text-brand-blue transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] delay-75 ${isVisible ? 'translate-y-0' : 'translate-y-[120%]'}`}>
-                Organized.
+                into decisions — and prove they worked.
               </span>
             </span>
           </h1>
           
           <p className={`mt-6 md:mt-8 text-lg md:text-xl lg:text-2xl text-gray-500 font-medium max-w-3xl px-4 sm:px-0 transition-all duration-700 delay-150 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            Connect signals, problems, opportunities, decisions, and launches in one AI workspace. Start every roadmap conversation with hard customer evidence, not scattered docs.
+            The accountability layer for product teams. Turn scattered customer feedback into evidence-backed decisions, then verify whether what you shipped actually solved the problem.
           </p>
         </div>
 
@@ -123,7 +123,7 @@ export const HeroSection = () => {
               <div className="w-2 h-2 rounded-full bg-brand-blue animate-pulse"></div> Generating PRD...
             </div>
             <div className="absolute -left-2 md:-left-6 bottom-1/4 bg-gray-900 text-white border border-gray-700 px-3 md:px-4 py-2 md:py-2.5 rounded-xl font-mono text-[10px] md:text-xs font-bold shadow-xl transform translate-z-50 animate-float flex items-center gap-2" style={{ animationDelay: '1s' }}>
-              ✓ Pushed to Jira
+              ✓ Decision Logged
             </div>
 
           </div>
@@ -133,14 +133,14 @@ export const HeroSection = () => {
         <div className={`mt-16 md:mt-20 flex flex-col items-center transition-all duration-700 delay-500 w-full ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-center w-full px-4 sm:px-0">
             <MagneticButton strength={0.2} className="w-full sm:w-auto">
-              <Link to="/signup?demo=true" className="w-full sm:w-auto bg-brand-blue text-white px-8 md:px-10 py-3.5 md:py-4 rounded-full font-semibold text-base md:text-lg hover:bg-gray-900 transition-all duration-300 flex items-center justify-center gap-3 group shadow-glow-blue btn-shine focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-blue focus-visible:ring-offset-2">
-                Explore a sample workspace <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              <Link to="/signup" className="w-full sm:w-auto bg-brand-blue text-white px-8 md:px-10 py-3.5 md:py-4 rounded-full font-semibold text-base md:text-lg hover:bg-gray-900 transition-all duration-300 flex items-center justify-center gap-3 group shadow-glow-blue btn-shine focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-blue focus-visible:ring-offset-2">
+                Start Free <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </MagneticButton>
             <MagneticButton strength={0.1} className="w-full sm:w-auto">
-              <button className="w-full sm:w-auto bg-white text-gray-900 border border-gray-200 px-8 md:px-10 py-3.5 md:py-4 rounded-full font-semibold text-base md:text-lg hover:bg-gray-50 transition-all duration-300 flex items-center justify-center gap-3 shadow-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-gray-200 focus-visible:ring-offset-2">
-                <PlayCircle className="w-5 h-5 text-brand-blue" /> Watch the 3-minute demo
-              </button>
+              <a href="#features" className="w-full sm:w-auto bg-white text-gray-900 border border-gray-200 px-8 md:px-10 py-3.5 md:py-4 rounded-full font-semibold text-base md:text-lg hover:bg-gray-50 transition-all duration-300 flex items-center justify-center gap-3 shadow-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-gray-200 focus-visible:ring-offset-2">
+                See How It Works
+              </a>
             </MagneticButton>
           </div>
           <span className="text-xs md:text-sm text-gray-400 font-medium mt-6 text-center">Every decision traced back to real customer signals.</span>

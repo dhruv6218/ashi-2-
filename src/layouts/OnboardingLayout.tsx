@@ -13,7 +13,7 @@ interface OnboardingLayoutProps {
 export const OnboardingLayout: React.FC<OnboardingLayoutProps> = ({ 
   children, 
   step, 
-  totalSteps = 7,
+  totalSteps = 3,
   showSkip = false,
   onSkip
 }) => {
@@ -35,7 +35,7 @@ export const OnboardingLayout: React.FC<OnboardingLayoutProps> = ({
       {/* Header */}
       <header className="w-full px-6 md:px-12 py-6 flex justify-between items-center relative z-40">
         <div className="flex items-center gap-6">
-          {step > 1 && step < 7 && (
+          {step > 1 && (
             <button 
               onClick={() => navigate(-1)}
               className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-900 hover:border-gray-300 transition-all shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue"

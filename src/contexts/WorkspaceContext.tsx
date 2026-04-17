@@ -1,14 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 import { MOCK_WORKSPACE } from '../lib/mockData';
-
-export interface Workspace {
-  id: string;
-  name: string;
-  slug: string;
-  timezone: string;
-  logo_url: string | null;
-}
+import { Workspace } from '../types';
 
 interface WorkspaceContextType {
   activeWorkspace: Workspace | null;
@@ -45,7 +37,11 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     // Simulate Supabase async fetch
     await new Promise(resolve => setTimeout(resolve, 600));
     
-    const fetchedWorkspaces = [MOCK_WORKSPACE];
+    const fetchedWorkspaces = [{
+      ...MOCK_WORKSPACE,
+      product_areas: ['Authentication', 'Core UI', 'API', 'Billing'],
+      segments: ['Enterprise', 'SMB', 'Growth']
+    }];
     setWorkspaces(fetchedWorkspaces);
     setActiveWorkspace(fetchedWorkspaces[0]);
 

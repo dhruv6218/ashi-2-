@@ -16,12 +16,18 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 
-export const SignalExplorer = () => {
+export const SignalExplorer = ({ defaultOpenAdd = false }: { defaultOpenAdd?: boolean }) => {
   const { activeWorkspace } = useWorkspace();
   const { addToast } = useToast();
   
   const [selectedSignalId, setSelectedSignalId] = useState<string | null>(null);
   const [globalFilter, setGlobalFilter] = useState('');
+  
+  // Advanced Filters
+  const [severityFilter, setSeverityFilter] = useState('');
+  const [sentimentFilter, setSentimentFilter] = useState('');
+  const [sourceFilter, setSourceFilter] = useState('');
+
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection, setRowSelection] = useState({});
   const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 });
@@ -32,6 +38,9 @@ export const SignalExplorer = () => {
     page: pageIndex + 1,
     limit: pageSize,
     globalFilter,
+    severityFilter,
+    sentimentFilter,
+    sourceFilter,
     sorting
   });
   
@@ -50,6 +59,12 @@ export const SignalExplorer = () => {
     sentiment_label: 'Neutral',
     account_id: ''
   });
+
+  React.useEffect(() => {
+    if (defaultOpenAdd) {
+      setIsAddModalOpen(true);
+    }
+  }, [defaultOpenAdd]);
 
   const handleSaveSignal = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -176,15 +191,59 @@ export const SignalExplorer = () => {
         </div>
       }
     >
-      <div className="bg-white border border-gray-200 rounded-xl p-2 mb-6 flex items-center shadow-sm focus-within:ring-2 focus-within:ring-astrix-teal transition-all">
-        <Search className="w-5 h-5 text-gray-400 ml-2 mr-3 shrink-0" />
-        <input 
-          type="text" 
-          value={globalFilter ?? ''}
-          onChange={(e) => setGlobalFilter(e.target.value)}
-          placeholder="Search all signals by keyword, account, or category..." 
-          className="w-full bg-transparent border-none outline-none text-sm text-gray-900 placeholder-gray-400 py-1"
-        />
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <div className="bg-white border border-gray-200 rounded-xl p-2 flex items-center shadow-sm focus-within:ring-2 focus-within:ring-astrix-teal transition-all flex-1">
+          <Search className="w-5 h-5 text-gray-400 ml-2 mr-3 shrink-0" />
+          <input 
+            type="text" 
+            value={globalFilter ?? ''}
+            onChange={(e) => setGlobalFilter(e.target.value)}
+            placeholder="Search all signals by keyword, account, or category..." 
+            className="w-full bg-transparent border-none outline-none text-sm text-gray-900 placeholder-gray-400 py-1"
+          />
+        </div>
+        <div className="flex gap-2 shrink-0 overflow-x-auto pb-2 md:pb-0">
+          <select 
+            value={severityFilter} 
+            onChange={e => setSeverityFilter(e.target.value)}
+            className="bg-white border border-gray-200 text-xs font-bold text-gray-500 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-astrix-teal shadow-sm min-w-[120px]"
+          >
+            <option value="">All Severities</option>
+            <option value="Critical">Critical</option>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+          </select>
+          <select 
+            value={sentimentFilter} 
+            onChange={e => setSentimentFilter(e.target.value)}
+            className="bg-white border border-gray-200 text-xs font-bold text-gray-500 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-astrix-teal shadow-sm min-w-[120px]"
+          >
+            <option value="">All Sentiments</option>
+            <option value="Positive">Positive</option>
+            <option value="Neutral">Neutral</option>
+            <option value="Negative">Negative</option>
+          </select>
+          <select 
+            value={sourceFilter} 
+            onChange={e => setSourceFilter(e.target.value)}
+            className="bg-white border border-gray-200 text-xs font-bold text-gray-500 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-astrix-teal shadow-sm min-w-[120px]"
+          >
+            <option value="">All Sources</option>
+            <option value="Manual">Manual</option>
+            <option value="CSV Import">CSV Import</option>
+            <option value="Support Ticket">Support Ticket</option>
+            <option value="Email">Email</option>
+          </select>
+          {(severityFilter || sentimentFilter || sourceFilter) && (
+            <button 
+              onClick={() => { setSeverityFilter(''); setSentimentFilter(''); setSourceFilter(''); }}
+              className="text-xs font-bold text-red-500 underline underline-offset-4 px-2 whitespace-nowrap"
+            >
+              Clear
+            </button>
+          )}
+        </div>
       </div>
 
       {Object.keys(rowSelection).length > 0 && (
@@ -372,9 +431,12 @@ export const SignalExplorer = () => {
                   <label className="block text-sm font-bold text-gray-900 mb-1">Source</label>
                   <select value={newSignal.source_type} onChange={e => setNewSignal({...newSignal, source_type: e.target.value})} className="w-full bg-gray-50 border border-gray-200 text-sm rounded-xl p-3 outline-none focus:ring-2 focus:ring-astrix-teal">
                     <option>Manual</option>
-                    <option>Slack</option>
-                    <option>Intercom</option>
+                    <option>CSV Import</option>
+                    <option>Support Ticket</option>
+                    <option>Interview Note</option>
+                    <option>App Review</option>
                     <option>Email</option>
+                    <option>Other</option>
                   </select>
                 </div>
                 <div>

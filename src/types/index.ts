@@ -13,6 +13,17 @@ export interface Signal {
   accounts?: { name: string; arr: number; plan: string; };
 }
 
+export interface Workspace {
+  id: string;
+  name: string;
+  slug: string;
+  timezone: string;
+  logo_url: string | null;
+  product_areas?: string[];
+  segments?: string[];
+  created_at: string;
+}
+
 export interface Account {
   id: string;
   workspace_id: string;
@@ -21,9 +32,9 @@ export interface Account {
   arr: number;
   plan: string | null;
   health_score: string | null;
-  created_at: string;
   signal_count?: number;
   last_signal_date?: string;
+  created_at: string;
 }
 
 export interface Problem {

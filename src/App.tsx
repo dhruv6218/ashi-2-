@@ -14,8 +14,6 @@ import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
 import { ForgotPassword } from './pages/ForgotPassword';
 import { ResetPassword } from './pages/ResetPassword';
-import { AcceptInvitation } from './pages/AcceptInvitation';
-import { Contact } from './pages/Contact';
 import { NotFound } from './pages/NotFound';
 
 // Marketing & Legal Pages
@@ -42,6 +40,9 @@ import { ArtifactStudio } from './pages/app/ArtifactStudio';
 import { PostLaunchTracker } from './pages/app/PostLaunchTracker';
 import { LaunchDetail } from './pages/app/LaunchDetail';
 import { Settings } from './pages/app/Settings';
+import { AccountDetail } from './pages/app/AccountDetail';
+import { ArtifactDetail } from './pages/app/ArtifactDetail';
+import { Navigate } from 'react-router-dom';
 
 function App() {
   useMousePosition();
@@ -61,21 +62,25 @@ function App() {
               <Route path="/signup" element={<Signup />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/accept-invitation" element={<AcceptInvitation />} />
               
               {/* Marketing & Legal */}
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/terms" element={<TermsOfService />} />
 
               {/* Protected Onboarding Flow */}
+              <Route path="/onboarding" element={<Navigate to="/onboarding/step-1" replace />} />
+              <Route path="/onboarding/workspace" element={<Navigate to="/onboarding/step-1" replace />} />
               <Route path="/onboarding/step-1" element={<ProtectedRoute><Step1Workspace /></ProtectedRoute>} />
               <Route path="/onboarding/step-2" element={<ProtectedRoute><Step2Data /></ProtectedRoute>} />
               <Route path="/onboarding/step-3" element={<ProtectedRoute><Step3Results /></ProtectedRoute>} />
 
               {/* Protected Main App Routes */}
               <Route path="/app" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/app/dashboard" element={<Navigate to="/app" replace />} />
               <Route path="/app/signals" element={<ProtectedRoute><SignalExplorer /></ProtectedRoute>} />
+              <Route path="/app/signals/new" element={<ProtectedRoute><SignalExplorer defaultOpenAdd /></ProtectedRoute>} />
               <Route path="/app/accounts" element={<ProtectedRoute><AccountsList /></ProtectedRoute>} />
+              <Route path="/app/accounts/:id" element={<ProtectedRoute><AccountDetail /></ProtectedRoute>} />
               
               <Route path="/app/problems" element={<ProtectedRoute><ProblemsList /></ProtectedRoute>} />
               <Route path="/app/problems/:id" element={<ProtectedRoute><ProblemDetail /></ProtectedRoute>} />
@@ -88,6 +93,7 @@ function App() {
               <Route path="/app/decisions/:id" element={<ProtectedRoute><DecisionDetail /></ProtectedRoute>} />
 
               <Route path="/app/artifacts" element={<ProtectedRoute><ArtifactStudio /></ProtectedRoute>} />
+              <Route path="/app/artifacts/:id" element={<ProtectedRoute><ArtifactDetail /></ProtectedRoute>} />
               
               <Route path="/app/launches" element={<ProtectedRoute><PostLaunchTracker /></ProtectedRoute>} />
               <Route path="/app/launches/:id" element={<ProtectedRoute><LaunchDetail /></ProtectedRoute>} />

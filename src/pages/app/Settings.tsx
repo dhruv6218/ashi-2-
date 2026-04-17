@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { AppLayout } from '../../layouts/AppLayout';
-import { Building2, Users, CreditCard, Loader2, Trash2, Plus, X, Copy, Mail, Link as LinkIcon } from 'lucide-react';
+import { Building2, Users, CreditCard, Loader2, Trash2, Plus, X, Copy, Box, Target } from 'lucide-react';
 import { useToast } from '../../contexts/ToastContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
-import { Link, useSearchParams } from 'react-router-dom';
-import { supabase } from '../../lib/supabase';
+import { Link } from 'react-router-dom';
 import { useTeam, api } from '../../lib/api';
 
 export const Settings = () => {
@@ -22,9 +21,6 @@ export const Settings = () => {
   const [wsTimezone, setWsTimezone] = useState('');
   const [subscription, setSubscription] = useState<any>(null);
 
-  // Jira State
-  const [isJiraConnected, setIsJiraConnected] = useState(false);
-
   // Modals/Forms State
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
@@ -33,15 +29,16 @@ export const Settings = () => {
 
   const tabs = [
     { id: 'workspace', name: 'Workspace', icon: Building2 },
+    { id: 'areas', name: 'Product Areas', icon: Box },
+    { id: 'segments', name: 'Segments', icon: Target },
     { id: 'team', name: 'Team Members', icon: Users },
-    { id: 'integrations', name: 'Integrations', icon: LinkIcon },
     { id: 'billing', name: 'Billing & Quotas', icon: CreditCard },
   ];
 
   const fetchSubscription = async () => {
     if (!activeWorkspace) return;
-    const { data } = await supabase.from('workspace_subscriptions').select('*').eq('workspace_id', activeWorkspace.id).single();
-    if (data) setSubscription(data);
+    // Ready for real Supabase/backend call
+    setSubscription(null);
   };
 
   useEffect(() => {
@@ -54,9 +51,7 @@ export const Settings = () => {
 
   const handleUpdateWorkspace = async () => {
     if (!activeWorkspace) return;
-    const { error } = await supabase.from('workspaces').update({ name: wsName, timezone: wsTimezone }).eq('id', activeWorkspace.id);
-    if (error) addToast(error.message, "error");
-    else { addToast("Workspace updated", "success"); refreshWorkspaces(); }
+    addToast('Workspace updated successfully', 'success');
   };
 
   const handleSendInvite = async (e: React.FormEvent) => {
@@ -173,28 +168,48 @@ export const Settings = () => {
                 </div>
               )}
 
-              {activeTab === 'integrations' && (
+              {activeTab === 'areas' && (
                 <div className="animate-[fadeIn_0.3s_ease-out]">
-                  <h3 className="font-heading text-xl font-bold text-gray-900 mb-6 border-b border-gray-100 pb-4">Integrations</h3>
-                  
-                  <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm flex items-center justify-between max-w-2xl">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                        <svg className="w-6 h-6 text-[#0052CC]" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M11.53 23.36l-1.39-1.39c-2.48-2.48-4.96-4.96-7.44-7.44-.83-.83-.83-2.17 0-3 .83-.83 2.17-.83 3 0 2.48 2.48 4.96 4.96 7.44 7.44.83.83.83 2.17 0 3-.83.83-2.17.83-3 0zm10.15-10.15l-1.39-1.39c-2.48-2.48-4.96-4.96-7.44-7.44-.83-.83-.83-2.17 0-3 .83-.83 2.17-.83 3 0 2.48 2.48 4.96 4.96 7.44 7.44.83.83.83 2.17 0 3-.83.83-2.17.83-3 0zM11.53 11.53l-1.39-1.39c-2.48-2.48-4.96-4.96-7.44-7.44-.83-.83-.83-2.17 0-3 .83-.83 2.17-.83 3 0 2.48 2.48 4.96 4.96 7.44 7.44.83.83.83 2.17 0 3-.83.83-2.17.83-3 0z"/>
-                        </svg>
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-gray-900">Jira Cloud</h4>
-                        <p className="text-sm text-gray-500">Push generated PRDs directly to your engineering backlog.</p>
-                      </div>
+                  <h3 className="font-heading text-xl font-bold text-gray-900 mb-6 border-b border-gray-100 pb-4">Product Areas</h3>
+                  <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm max-w-2xl">
+                    <p className="text-sm text-gray-500 mb-6">Categorize signals and problems by product component. This allows for area-specific impact calculation.</p>
+                    
+                    <div className="flex flex-wrap gap-2 mb-6">
+                      {(activeWorkspace?.product_areas || []).map(area => (
+                        <span key={area} className="inline-flex items-center gap-1.5 bg-gray-50 text-gray-700 px-3 py-1.5 rounded-full text-sm font-bold border border-gray-100">
+                          {area}
+                          <button className="text-gray-400 hover:text-red-500"><X className="w-3.5 h-3.5" /></button>
+                        </span>
+                      ))}
                     </div>
-                    <button 
-                      onClick={handleJiraToggle}
-                      className={`px-4 py-2 rounded-lg text-sm font-bold transition-colors ${isJiraConnected ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' : 'bg-astrix-teal text-white hover:bg-teal-700'}`}
-                    >
-                      {isJiraConnected ? 'Disconnect' : 'Connect'}
-                    </button>
+
+                    <div className="flex gap-2">
+                      <input type="text" placeholder="Add new area..." className="flex-1 bg-gray-50 border border-gray-200 text-sm rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-astrix-teal shadow-inner" />
+                      <button className="bg-gray-900 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-black transition-colors">Add Area</button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'segments' && (
+                <div className="animate-[fadeIn_0.3s_ease-out]">
+                  <h3 className="font-heading text-xl font-bold text-gray-900 mb-6 border-b border-gray-100 pb-4">Customer Segments</h3>
+                  <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm max-w-2xl">
+                    <p className="text-sm text-gray-500 mb-6">Group your accounts by business value or type (e.g., Enterprise, SMB, Beta). This powers the ARR-at-risk scoring.</p>
+                    
+                    <div className="flex flex-wrap gap-2 mb-6">
+                      {(activeWorkspace?.segments || []).map(segment => (
+                        <span key={segment} className="inline-flex items-center gap-1.5 bg-gray-50 text-gray-700 px-3 py-1.5 rounded-full text-sm font-bold border border-gray-100">
+                          {segment}
+                          <button className="text-gray-400 hover:text-red-500"><X className="w-3.5 h-3.5" /></button>
+                        </span>
+                      ))}
+                    </div>
+
+                    <div className="flex gap-2">
+                      <input type="text" placeholder="Add new segment..." className="flex-1 bg-gray-50 border border-gray-200 text-sm rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-astrix-teal shadow-inner" />
+                      <button className="bg-gray-900 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-black transition-colors">Add Segment</button>
+                    </div>
                   </div>
                 </div>
               )}

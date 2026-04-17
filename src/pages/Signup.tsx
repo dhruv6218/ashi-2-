@@ -161,11 +161,11 @@ export const Signup = () => {
           Already have an account? <Link to="/login" className="text-brand-blue font-bold hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue rounded-sm">Sign in →</Link>
         </p>
 
-        {/* Trust Badges */}
-        <div className="mt-8 pt-6 border-t border-gray-100 flex justify-center items-center gap-4 text-[10px] text-gray-400 font-mono font-bold uppercase tracking-wider">
-          <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3" /> SOC2 Ready</span>
+        {/* Trust Signal */}
+        <div className="mt-8 pt-6 border-t border-gray-100 flex justify-center items-center gap-2 text-[10px] text-gray-400 font-mono font-bold uppercase tracking-wider">
+          <span>Privacy-first</span>
           <span>•</span>
-          <span>GDPR</span>
+          <span>No credit card required</span>
         </div>
       </div>
     </AuthLayout>

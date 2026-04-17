@@ -19,77 +19,63 @@ export const Pricing = () => {
   const tiers = [
     {
       name: "Free",
-      price: 0,
       displayPrice: "$0",
       period: "forever",
-      desc: "For solo founders and PMs to validate the evidence-based product loop.",
+      desc: "For solo founders and PMs validating the evidence-based product loop.",
       features: [
         "1 Member + 2 Viewers",
         "1 Workspace",
         "200 signals (Lifetime total)",
-        "100 AI classifications & 5 memos",
-        "Standard launch reviews"
+        "CSV upload & manual entry",
+        "Sample workspace included",
+        "Standard launch reviews & verdicts"
       ],
       cta: "Start Free",
       popular: false
     },
     {
       name: "Starter",
-      price: isAnnual ? 588 : 59,
-      displayPrice: isAnnual ? "$588" : "$59",
-      period: isAnnual ? "/year" : "/month",
+      displayPrice: "$59",
+      period: "/month",
       desc: "For early-stage startups establishing their first evidence-based product loop.",
       features: [
         "Up to 3 Members + Unlimited Viewers",
         "1 Workspace",
         "2,000 signals/month",
+        "CSV upload & manual entry",
+        "Sample workspace included",
         "500 AI classifications & 20 memos",
-        "Standard launch reviews"
+        "Launch reviews & verdicts",
+        "Email support"
       ],
       cta: "Start with Starter",
       popular: false
     },
     {
       name: "Growth",
-      price: isAnnual ? 1788 : 179,
-      displayPrice: isAnnual ? "$1,788" : "$179",
-      period: isAnnual ? "/year" : "/month",
-      desc: "The execution engine with automated workflows and AI insights for scaling teams.",
+      displayPrice: "$179",
+      period: "/month",
+      desc: "For scaling product teams that need deeper signal volume and team collaboration.",
       features: [
         "Up to 8 Members + Unlimited Viewers",
         "1 Workspace",
         "10,000 signals/month",
-        "Ask Assistant included",
+        "CSV upload & manual entry",
         "2,500 AI classifications & 100 memos",
-        "Jira Cloud Integration"
+        "Launch reviews & verdicts",
+        "Ask Assistant (beta)",
+        "Priority support"
       ],
-      cta: "Upgrade to Growth",
+      cta: "Talk to Founder",
       popular: true
-    },
-    {
-      name: "Scale",
-      price: isAnnual ? 4788 : 449,
-      displayPrice: isAnnual ? "$4,788" : "$449",
-      period: isAnnual ? "/year" : "/month",
-      desc: "Self-serve governance and multi-squad standardization for mature SaaS orgs.",
-      features: [
-        "Up to 20 Members + Unlimited Viewers",
-        "Up to 10 Workspaces",
-        "50,000 signals/month",
-        "10k AI classifications & 500 memos",
-        "Ask Assistant (Large limits)",
-        "Full Audit Log & Custom Checkpoints"
-      ],
-      cta: "Upgrade to Scale",
-      popular: false
     }
   ];
 
   const faqs = [
-    { q: "What counts as a 'signal'?", a: "A signal is any individual piece of feedback ingested into Astrix. This could be a single support ticket, an app store review, or a row in a CSV upload." },
-    { q: "What are the user roles?", a: "We keep it simple: Owners (billing & settings), Members (editors who can create decisions and artifacts), and Viewers (free, unlimited users who can read memos and track launch progress in paid plans)." },
-    { q: "How do payments work?", a: "We partner with secure payment providers to process all global cards. You can choose to be billed monthly or annually." },
-    { q: "Is Jira integration included in the Starter plan?", a: "No, the Jira Cloud integration requires the Growth plan or above, as it utilizes advanced backend workflows to push generated artifacts directly to your engineering backlog." },
+    { q: "What counts as a 'signal'?", a: "A signal is any individual piece of feedback ingested into Astrix — a support ticket, app store review, interview note, or a row in a CSV upload." },
+    { q: "What are the user roles?", a: "We keep it simple: Owners (billing & settings), Members (editors who can create decisions and artifacts), and Viewers (free, unlimited users who can read memos and track launch progress)." },
+    { q: "How do I import data?", a: "Astrix supports CSV upload and manual signal entry on all plans. You can also start with a sample workspace to explore the full product loop before importing real data." },
+    { q: "Does Astrix include a sample workspace?", a: "Yes. Every plan includes a sample workspace with pre-loaded signals, problems, opportunities, a decision memo, and an active launch so you can experience the full product loop immediately." },
     { q: "Is my data used to train your AI models?", a: "Absolutely not. We use enterprise APIs with strict zero-retention policies. Your workspace data is isolated and never used for training." },
     { q: "Can I cancel anytime?", a: "Yes, you can cancel your subscription at any time from the billing settings. You will retain access until the end of your current billing period." }
   ];
@@ -144,7 +130,7 @@ export const Pricing = () => {
 
       {/* Pricing Cards */}
       <div className="max-w-[1400px] mx-auto px-4 md:px-8 -mt-12 relative z-10 mb-32" ref={cardsRef}>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-[1100px] mx-auto">
           {tiers.map((tier, i) => (
             <div 
               key={i} 

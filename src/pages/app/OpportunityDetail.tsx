@@ -216,7 +216,7 @@ export const OpportunityDetail = () => {
               <div>
                 <label className="block text-sm font-bold text-gray-900 mb-2">Action</label>
                 <select value={decisionAction} onChange={e => setDecisionAction(e.target.value)} className="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-xl p-3 outline-none focus:ring-2 focus:ring-astrix-teal">
-                  <option value="Build">Build (Add to Roadmap)</option>
+                  <option value="Build">Build</option>
                   <option value="Fix">Fix (Bug / Tech Debt)</option>
                   <option value="Experiment">Experiment (Research / A-B Test)</option>
                   <option value="Defer">Defer (Not right now)</option>

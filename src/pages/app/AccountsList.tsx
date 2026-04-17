@@ -1,9 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { AppLayout } from '../../layouts/AppLayout';
-import { Building2, Plus, UploadCloud, X, Loader2 } from 'lucide-react';
+import { Building2, Plus, UploadCloud, X, Loader2, Search, HeartPulse } from 'lucide-react';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { useAccounts, api } from '../../lib/api';
 import { useToast } from '../../contexts/ToastContext';
+import { Link } from 'react-router-dom';
 import {
   createColumnHelper,
   flexRender,
@@ -27,9 +28,12 @@ export const AccountsList = () => {
   const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 });
   const pagination = useMemo(() => ({ pageIndex, pageSize }), [pageIndex, pageSize]);
 
+  const [globalFilter, setGlobalFilter] = useState('');
+
   const { data, isLoading } = useAccounts(activeWorkspace?.id, {
     page: pageIndex + 1,
     limit: pageSize,
+    globalFilter,
     sorting
   });
 
@@ -66,15 +70,31 @@ export const AccountsList = () => {
   const accountColumns = useMemo(() => [
     columnHelper.accessor('name', { 
       header: 'Account Name', 
-      cell: info => <span className="font-bold text-gray-900">{info.getValue()}</span> 
+      cell: info => <Link to={`/app/accounts/${info.row.original.id}`} className="font-bold text-gray-900 hover:text-brand-blue transition-colors underline decoration-gray-200 underline-offset-4">{info.getValue()}</Link> 
     }),
     columnHelper.accessor('arr', { 
       header: 'ARR', 
       cell: info => <span className="font-mono font-bold text-astrix-teal">{formatCurrency(info.getValue() || 0)}</span> 
     }),
-    columnHelper.accessor('plan', { 
-      header: 'Plan', 
-      cell: info => <span className="bg-gray-100 text-gray-600 px-2.5 py-1 rounded-md text-xs font-bold">{info.getValue() || 'Standard'}</span> 
+    columnHelper.accessor('domain', { 
+      header: 'Domain', 
+      cell: info => <span className="text-gray-500 font-medium">{info.getValue() || '--'}</span> 
+    }),
+    columnHelper.accessor('health_score', { 
+      header: 'Health', 
+      cell: info => {
+        const score = parseInt(info.getValue() || '0');
+        let color = 'text-gray-400';
+        if (score >= 80) color = 'text-green-500';
+        else if (score >= 50) color = 'text-yellow-500';
+        else if (score > 0) color = 'text-red-500';
+        return (
+          <div className="flex items-center gap-1.5 font-bold">
+            <HeartPulse className={`w-3.5 h-3.5 ${color}`} />
+            <span className={color}>{score || '--'}</span>
+          </div>
+        );
+      }
     }),
     columnHelper.accessor('signal_count', { 
       header: 'Signals', 
@@ -109,6 +129,17 @@ export const AccountsList = () => {
         </div>
       }
     >
+      <div className="bg-white border border-gray-200 rounded-xl p-2 mb-6 flex items-center shadow-sm focus-within:ring-2 focus-within:ring-astrix-teal transition-all">
+        <Search className="w-5 h-5 text-gray-400 ml-2 mr-3 shrink-0" />
+        <input 
+          type="text" 
+          value={globalFilter}
+          onChange={(e) => setGlobalFilter(e.target.value)}
+          placeholder="Search accounts by name or domain..." 
+          className="w-full bg-transparent border-none outline-none text-sm text-gray-900 placeholder-gray-400 py-1"
+        />
+      </div>
+
       <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden min-h-[400px] flex flex-col">
         {isLoading ? (
           <div className="flex justify-center items-center h-64"><Loader2 className="w-8 h-8 animate-spin text-astrix-teal" /></div>
@@ -154,7 +185,7 @@ export const AccountsList = () => {
                 return (
                   <div key={row.id} className="bg-white border border-gray-200 p-4 rounded-xl shadow-sm flex flex-col gap-3">
                     <div className="flex justify-between items-start">
-                      <span className="font-bold text-gray-900">{acc.name}</span>
+                      <Link to={`/app/accounts/${acc.id}`} className="font-bold text-gray-900 hover:text-brand-blue underline decoration-gray-200">{acc.name}</Link>
                       <span className="font-mono font-bold text-astrix-teal">{formatCurrency(acc.arr)}</span>
                     </div>
                     <div className="flex justify-between items-center text-xs">
