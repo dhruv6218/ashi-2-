@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { AppLayout } from '../../layouts/AppLayout';
-import { Search, Hash, MessageCircle, Github, AlertCircle, X, FileSpreadsheet, Database, UploadCloud } from 'lucide-react';
+import { Search, Hash, MessageCircle, Github, AlertCircle, X, FileSpreadsheet, Database, UploadCloud, Plus, Loader2 } from 'lucide-react';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
-import { useSignalStore, Signal } from '../../store/useSignalStore';
+import { useSignals, useAccounts, api, triggerUpdate } from '../../lib/api';
+import { Signal } from '../../types';
 import { TableSkeleton } from '../../components/ui/Skeleton';
 import { AIBadge } from '../../components/ui/AIBadge';
 import { useToast } from '../../contexts/ToastContext';
@@ -10,29 +11,67 @@ import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
-  getSortedRowModel,
-  getFilteredRowModel,
   SortingState,
+  PaginationState,
   useReactTable,
 } from '@tanstack/react-table';
 
 export const SignalExplorer = () => {
   const { activeWorkspace } = useWorkspace();
-  const { signals, isLoading, fetchSignals } = useSignalStore();
   const { addToast } = useToast();
   
   const [selectedSignalId, setSelectedSignalId] = useState<string | null>(null);
   const [globalFilter, setGlobalFilter] = useState('');
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection, setRowSelection] = useState({});
+  const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 });
+  const pagination = useMemo(() => ({ pageIndex, pageSize }), [pageIndex, pageSize]);
 
-  useEffect(() => {
-    if (activeWorkspace) {
-      fetchSignals(activeWorkspace.id);
+  // Fetch Server State
+  const { data, isLoading } = useSignals(activeWorkspace?.id, {
+    page: pageIndex + 1,
+    limit: pageSize,
+    globalFilter,
+    sorting
+  });
+  
+  const { data: accountsData } = useAccounts(activeWorkspace?.id);
+  const accounts = accountsData?.rows || [];
+
+  const activeSignal = data.rows.find(s => s.id === selectedSignalId);
+
+  // Manual Signal State
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isSavingSignal, setIsSavingSignal] = useState(false);
+  const [newSignal, setNewSignal] = useState({
+    raw_text: '',
+    source_type: 'Manual',
+    severity_label: 'Medium',
+    sentiment_label: 'Neutral',
+    account_id: ''
+  });
+
+  const handleSaveSignal = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!activeWorkspace || !newSignal.raw_text) return;
+    
+    setIsSavingSignal(true);
+    try {
+      const selectedAccount = accounts.find(a => a.id === newSignal.account_id);
+      await api.signals.create({
+        workspace_id: activeWorkspace.id,
+        ...newSignal,
+        accounts: selectedAccount ? { name: selectedAccount.name, arr: selectedAccount.arr, plan: selectedAccount.plan || 'Standard' } : undefined
+      });
+      addToast("Signal added successfully", "success");
+      setIsAddModalOpen(false);
+      setNewSignal({ raw_text: '', source_type: 'Manual', severity_label: 'Medium', sentiment_label: 'Neutral', account_id: '' });
+    } catch (err: any) {
+      addToast("Failed to add signal", "error");
+    } finally {
+      setIsSavingSignal(false);
     }
-  }, [activeWorkspace, fetchSignals]);
-
-  const activeSignal = signals.find(s => s.id === selectedSignalId);
+  };
 
   const getSourceIcon = (source: string) => {
     switch(source?.toLowerCase()) {
@@ -97,15 +136,18 @@ export const SignalExplorer = () => {
   ], []);
 
   const table = useReactTable({
-    data: signals,
+    data: data.rows,
     columns,
-    state: { sorting, globalFilter, rowSelection },
+    pageCount: Math.ceil(data.total / pageSize),
+    state: { sorting, globalFilter, rowSelection, pagination },
     onSortingChange: setSorting,
     onGlobalFilterChange: setGlobalFilter,
     onRowSelectionChange: setRowSelection,
+    onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
+    manualPagination: true,
+    manualSorting: true,
+    manualFiltering: true,
   });
 
   const handleBulkAction = (action: string) => {
@@ -116,14 +158,20 @@ export const SignalExplorer = () => {
   return (
     <AppLayout 
       title="Signal Explorer" 
-      subtitle={`${signals.length} total signals ingested`}
+      subtitle={`${data.total} total signals ingested`}
       actions={
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           <button 
             onClick={() => window.dispatchEvent(new CustomEvent('open-upload-modal'))}
             className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-50 transition-colors shadow-sm flex items-center gap-2"
           >
             <UploadCloud className="w-4 h-4" /> Import CSV
+          </button>
+          <button 
+            onClick={() => setIsAddModalOpen(true)}
+            className="bg-astrix-teal text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-teal-700 transition-colors shadow-sm flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" /> Add Signal
           </button>
         </div>
       }
@@ -155,43 +203,87 @@ export const SignalExplorer = () => {
           
           {isLoading ? (
             <TableSkeleton rows={8} />
-          ) : signals.length === 0 ? (
+          ) : data.rows.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-64 text-gray-400 p-6 text-center">
               <Database className="w-12 h-12 mb-4 opacity-20" />
               <h3 className="text-lg font-bold text-gray-900 mb-1">No signals found</h3>
               <p className="font-medium text-sm mb-4">Try adjusting your search or upload a CSV to get started.</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm whitespace-nowrap">
-                <thead className="bg-gray-50 border-b border-gray-200 font-mono text-xs text-gray-500 uppercase tracking-wider">
-                  {table.getHeaderGroups().map(headerGroup => (
-                    <tr key={headerGroup.id}>
-                      {headerGroup.headers.map(header => (
-                        <th key={header.id} className="p-4 font-semibold cursor-pointer hover:bg-gray-100 transition-colors" onClick={header.column.getToggleSortingHandler()}>
-                          {flexRender(header.column.columnDef.header, header.getContext())}
-                          {{ asc: ' 🔼', desc: ' 🔽' }[header.column.getIsSorted() as string] ?? null}
-                        </th>
-                      ))}
-                    </tr>
-                  ))}
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {table.getRowModel().rows.map(row => (
-                    <tr 
+            <div className="flex flex-col h-full">
+              
+              {/* Desktop Table View */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-left text-sm whitespace-nowrap">
+                  <thead className="bg-gray-50 border-b border-gray-200 font-mono text-xs text-gray-500 uppercase tracking-wider">
+                    {table.getHeaderGroups().map(headerGroup => (
+                      <tr key={headerGroup.id}>
+                        {headerGroup.headers.map(header => (
+                          <th key={header.id} className="p-4 font-semibold cursor-pointer hover:bg-gray-100 transition-colors" onClick={header.column.getToggleSortingHandler()}>
+                            {flexRender(header.column.columnDef.header, header.getContext())}
+                            {{ asc: ' 🔼', desc: ' 🔽' }[header.column.getIsSorted() as string] ?? null}
+                          </th>
+                        ))}
+                      </tr>
+                    ))}
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {table.getRowModel().rows.map(row => (
+                      <tr 
+                        key={row.id} 
+                        onClick={() => setSelectedSignalId(row.original.id)}
+                        className={`cursor-pointer transition-colors ${selectedSignalId === row.original.id ? 'bg-blue-50/50' : 'hover:bg-gray-50'}`}
+                      >
+                        {row.getVisibleCells().map(cell => (
+                          <td key={cell.id} className="p-4">
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile Cards View */}
+              <div className="md:hidden flex flex-col p-4 gap-3">
+                {table.getRowModel().rows.map(row => {
+                  const sig = row.original;
+                  return (
+                    <div 
                       key={row.id} 
-                      onClick={() => setSelectedSignalId(row.original.id)}
-                      className={`cursor-pointer transition-colors ${selectedSignalId === row.original.id ? 'bg-blue-50/50' : 'hover:bg-gray-50'}`}
+                      onClick={() => setSelectedSignalId(sig.id)} 
+                      className={`border p-4 rounded-xl shadow-sm flex flex-col gap-3 cursor-pointer transition-colors ${selectedSignalId === sig.id ? 'bg-blue-50/50 border-brand-blue/30' : 'bg-white border-gray-200 hover:bg-gray-50'}`}
                     >
-                      {row.getVisibleCells().map(cell => (
-                        <td key={cell.id} className="p-4">
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                      <div className="flex justify-between items-start">
+                        <div className="flex items-center gap-2">
+                          {getSourceIcon(sig.source_type)}
+                          <span className="font-bold text-sm text-gray-900">{sig.source_type}</span>
+                        </div>
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${sig.severity_label === 'Critical' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'}`}>
+                          {sig.severity_label}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-700 line-clamp-3 font-medium">"{sig.raw_text}"</p>
+                      <div className="flex justify-between items-center text-xs text-gray-500 font-mono mt-1">
+                        <span className="font-bold text-gray-900">{sig.accounts?.name || 'Unknown Account'}</span>
+                        <span className="bg-gray-100 px-2 py-1 rounded">{sig.product_area || 'Unknown'}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              
+              {/* Server-Side Pagination Controls */}
+              <div className="flex items-center justify-between p-4 border-t border-gray-100 bg-gray-50 mt-auto">
+                <span className="text-sm text-gray-500 font-medium">
+                  Showing {table.getRowModel().rows.length} of {data.total} signals
+                </span>
+                <div className="flex gap-2">
+                  <button onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()} className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-700 disabled:opacity-50 hover:bg-gray-50">Prev</button>
+                  <button onClick={() => table.nextPage()} disabled={!table.getCanNextPage()} className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm font-bold text-gray-700 disabled:opacity-50 hover:bg-gray-50">Next</button>
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -254,6 +346,74 @@ export const SignalExplorer = () => {
         </div>
 
       </div>
+
+      {/* Manual Add Signal Modal */}
+      {isAddModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm" onClick={() => !isSavingSignal && setIsAddModalOpen(false)}></div>
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg relative z-10 overflow-hidden animate-[fadeIn_0.2s_ease-out]">
+            <div className="flex justify-between items-center p-6 border-b border-gray-100">
+              <h2 className="font-heading text-xl font-bold text-gray-900">Add Signal Manually</h2>
+              <button onClick={() => !isSavingSignal && setIsAddModalOpen(false)} className="text-gray-400 hover:text-gray-900"><X className="w-5 h-5" /></button>
+            </div>
+            <form onSubmit={handleSaveSignal} className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-bold text-gray-900 mb-1">Raw Feedback / Signal Text *</label>
+                <textarea 
+                  required 
+                  value={newSignal.raw_text} 
+                  onChange={e => setNewSignal({...newSignal, raw_text: e.target.value})} 
+                  placeholder="Paste the customer feedback here..."
+                  className="w-full bg-gray-50 border border-gray-200 text-sm rounded-xl p-3 outline-none focus:ring-2 focus:ring-astrix-teal min-h-[100px] resize-none" 
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-900 mb-1">Source</label>
+                  <select value={newSignal.source_type} onChange={e => setNewSignal({...newSignal, source_type: e.target.value})} className="w-full bg-gray-50 border border-gray-200 text-sm rounded-xl p-3 outline-none focus:ring-2 focus:ring-astrix-teal">
+                    <option>Manual</option>
+                    <option>Slack</option>
+                    <option>Intercom</option>
+                    <option>Email</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-900 mb-1">Linked Account</label>
+                  <select value={newSignal.account_id} onChange={e => setNewSignal({...newSignal, account_id: e.target.value})} className="w-full bg-gray-50 border border-gray-200 text-sm rounded-xl p-3 outline-none focus:ring-2 focus:ring-astrix-teal">
+                    <option value="">-- No Account --</option>
+                    {accounts.map(acc => (
+                      <option key={acc.id} value={acc.id}>{acc.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-900 mb-1">Severity</label>
+                  <select value={newSignal.severity_label} onChange={e => setNewSignal({...newSignal, severity_label: e.target.value})} className="w-full bg-gray-50 border border-gray-200 text-sm rounded-xl p-3 outline-none focus:ring-2 focus:ring-astrix-teal">
+                    <option>Critical</option>
+                    <option>High</option>
+                    <option>Medium</option>
+                    <option>Low</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-900 mb-1">Sentiment</label>
+                  <select value={newSignal.sentiment_label} onChange={e => setNewSignal({...newSignal, sentiment_label: e.target.value})} className="w-full bg-gray-50 border border-gray-200 text-sm rounded-xl p-3 outline-none focus:ring-2 focus:ring-astrix-teal">
+                    <option>Negative</option>
+                    <option>Neutral</option>
+                    <option>Positive</option>
+                  </select>
+                </div>
+              </div>
+              <div className="flex justify-end gap-2 pt-4 mt-2 border-t border-gray-100">
+                <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-2 text-sm font-bold text-gray-500 hover:text-gray-900">Cancel</button>
+                <button type="submit" disabled={isSavingSignal || !newSignal.raw_text} className="bg-astrix-teal text-white px-4 py-2 rounded-lg text-sm font-bold disabled:opacity-50 flex items-center gap-2">
+                  {isSavingSignal && <Loader2 className="w-4 h-4 animate-spin"/>} Save Signal
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </AppLayout>
   );
 };

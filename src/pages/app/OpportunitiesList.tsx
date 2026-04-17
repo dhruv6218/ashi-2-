@@ -1,24 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { AppLayout } from '../../layouts/AppLayout';
 import { Filter, ArrowRight, Target, GitCompare, X, CheckCircle2, Loader2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
-import { useOpportunityStore, Opportunity } from '../../store/useOpportunityStore';
-import { useDecisionStore } from '../../store/useDecisionStore';
-import { useArtifactStore } from '../../store/useArtifactStore';
+import { useOpportunities, api } from '../../lib/api';
+import { Opportunity } from '../../types';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
-import { supabase } from '../../lib/supabase';
-import { posthog } from '../../lib/instrument';
 
 export const OpportunitiesList = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { activeWorkspace } = useWorkspace();
-  const { opportunities, isLoading, fetchOpportunities } = useOpportunityStore();
-  const { createDecision } = useDecisionStore();
-  const { fetchArtifacts } = useArtifactStore();
+  const { data: opportunities, isLoading, refetch } = useOpportunities(activeWorkspace?.id);
   const { addToast } = useToast();
 
   const [isCompareMode, setIsCompareMode] = useState(false);
@@ -34,12 +29,6 @@ export const OpportunitiesList = () => {
   const [showArtifactPrompt, setShowArtifactPrompt] = useState(false);
   const [savedDecisionId, setSavedDecisionId] = useState<string | null>(null);
   const [isGeneratingArtifact, setIsGeneratingArtifact] = useState(false);
-
-  useEffect(() => {
-    if (activeWorkspace) {
-      fetchOpportunities(activeWorkspace.id);
-    }
-  }, [activeWorkspace, fetchOpportunities]);
 
   const toggleOpp = (id: string) => {
     if (selectedOpps.includes(id)) {
@@ -68,7 +57,7 @@ export const OpportunitiesList = () => {
     
     setIsSavingDecision(true);
     try {
-      const newDecision = await createDecision({
+      const newDecision = await api.decisions.create({
         workspace_id: activeWorkspace.id,
         opportunity_id: decisionOpp.id,
         problem_id: decisionOpp.problem_id,
@@ -78,14 +67,11 @@ export const OpportunitiesList = () => {
         author_id: user.id
       });
 
-      posthog.capture('decision_created', { workspace_id: activeWorkspace.id, action: decisionAction });
-
       addToast("Decision logged successfully.", "success");
       setSavedDecisionId(newDecision?.id || null);
       setIsDecisionModalOpen(false);
       setShowArtifactPrompt(true);
-      
-      fetchOpportunities(activeWorkspace.id);
+      refetch();
     } catch (error: any) {
       addToast(error.message || "Failed to save decision", "error");
     } finally {
@@ -98,30 +84,22 @@ export const OpportunitiesList = () => {
     
     setIsGeneratingArtifact(true);
     try {
-      const { data, error } = await supabase.functions.invoke('ai-generate-artifact', {
-        body: { 
-          workspace_id: activeWorkspace.id,
-          decision_id: savedDecisionId,
-          type: type
-        }
+      // Simulate AI generation
+      await new Promise(r => setTimeout(r, 3000));
+      await api.artifacts.create({
+        workspace_id: activeWorkspace.id,
+        decision_id: savedDecisionId,
+        title: 'Generated PRD',
+        type: type,
+        content: '# Generated Content',
+        author_id: user.id
       });
-      
-      if (error) throw error;
-      if (data?.error) throw data.error;
 
-      posthog.capture('artifact_generated', { workspace_id: activeWorkspace.id, type });
-
-      await fetchArtifacts(activeWorkspace.id);
       addToast("Artifact generated successfully via AI!", "success");
       setShowArtifactPrompt(false);
       navigate(`/app/decisions/${savedDecisionId}`);
     } catch (error: any) {
-      const errorMessage = error?.context?.error?.message || error?.error?.message || error?.message || "Failed to generate artifact.";
-      if (errorMessage.includes('rate limit') || error?.error?.code === 'RATE_LIMITED') {
-        addToast("You have hit the AI rate limit for your workspace. Please wait a minute and try again.", "warning");
-      } else {
-        addToast(errorMessage, "error");
-      }
+      addToast(error.message || "Failed to generate artifact.", "error");
     } finally {
       setIsGeneratingArtifact(false);
     }

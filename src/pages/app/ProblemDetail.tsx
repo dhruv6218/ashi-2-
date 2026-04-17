@@ -1,28 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { AppLayout } from '../../layouts/AppLayout';
-import { AlertCircle, TrendingUp, TrendingDown, Radio, Clock, ArrowRight, Quote, Loader2, Building2 } from 'lucide-react';
+import { AlertCircle, TrendingUp, TrendingDown, Radio, ArrowRight, Quote, Loader2, Building2 } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
-import { useProblemStore } from '../../store/useProblemStore';
+import { useProblem } from '../../lib/api';
 
 export const ProblemDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const { 
-    currentProblem, 
-    problemSignals, 
-    problemAccounts,
-    isLoading, 
-    fetchProblemDetails 
-  } = useProblemStore();
-  
+  const { data, isLoading } = useProblem(id);
   const [activeTab, setActiveTab] = useState('overview');
 
-  useEffect(() => {
-    if (id) {
-      fetchProblemDetails(id);
-    }
-  }, [id, fetchProblemDetails]);
-
-  // Removed 'History' and 'Comments' to ensure 100% UI honesty.
   const tabs = ['Overview', 'Evidence', 'Accounts'];
 
   const formatCurrency = (value: number) => {
@@ -44,7 +30,7 @@ export const ProblemDetail = () => {
     );
   }
 
-  if (!currentProblem) {
+  if (!data || !data.problem) {
     return (
       <AppLayout title="Problem Not Found" subtitle="Could not load data">
         <div className="flex items-center justify-center h-64 text-gray-500">Problem does not exist or you don't have access.</div>
@@ -52,6 +38,7 @@ export const ProblemDetail = () => {
     );
   }
 
+  const { problem: currentProblem, signals: problemSignals, accounts: problemAccounts } = data;
   const totalArrRisk = problemAccounts.reduce((sum, acc) => sum + Number(acc.arr), 0);
 
   return (
@@ -64,7 +51,6 @@ export const ProblemDetail = () => {
         </Link>
       }
     >
-      {/* Top Stats Bar */}
       <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm mb-8 flex flex-wrap gap-6 md:gap-16">
         <div>
           <div className="text-[10px] font-mono text-gray-400 uppercase font-bold mb-1">Severity</div>
@@ -91,7 +77,6 @@ export const ProblemDetail = () => {
         </div>
       </div>
 
-      {/* Tabs */}
       <div className="flex gap-6 border-b border-gray-200 mb-8 overflow-x-auto hide-scrollbar">
         {tabs.map(tab => (
           <button
@@ -109,9 +94,7 @@ export const ProblemDetail = () => {
         ))}
       </div>
 
-      {/* Tab Content */}
       <div className="animate-[fadeIn_0.3s_ease-out]">
-        
         {activeTab === 'overview' && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-8">
@@ -171,9 +154,6 @@ export const ProblemDetail = () => {
                   <span className="font-bold text-gray-900">{problemAccounts.length}</span> accounts affected — <span className="font-bold text-brand-blue">{formatCurrency(totalArrRisk)}</span> ARR at risk
                 </p>
               </div>
-              <button className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-50 transition-colors shadow-sm w-full sm:w-auto">
-                Export CSV
-              </button>
             </div>
 
             {problemAccounts.length === 0 ? (
@@ -181,7 +161,6 @@ export const ProblemDetail = () => {
                 <Building2 className="w-10 h-10 text-gray-400 mx-auto mb-3" />
                 <h4 className="text-gray-900 font-bold mb-1">No accounts linked yet.</h4>
                 <p className="text-gray-500 text-sm mb-4">Upload your account list to see which customers are affected.</p>
-                <Link to="/app/settings?tab=accounts" className="text-brand-blue font-bold text-sm hover:underline">Upload Accounts →</Link>
               </div>
             ) : (
               <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
@@ -193,8 +172,6 @@ export const ProblemDetail = () => {
                         <th className="p-4 font-semibold">ARR</th>
                         <th className="p-4 font-semibold">Plan</th>
                         <th className="p-4 font-semibold">Churn Risk</th>
-                        <th className="p-4 font-semibold">Signal Count</th>
-                        <th className="p-4 font-semibold">Last Signal Date</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -210,8 +187,6 @@ export const ProblemDetail = () => {
                               {acc.health_score || 'Low'}
                             </span>
                           </td>
-                          <td className="p-4 font-bold text-gray-700">{acc.signal_count}</td>
-                          <td className="p-4 text-gray-500 font-mono text-xs">{formatDate(acc.last_signal_date)}</td>
                         </tr>
                       ))}
                     </tbody>

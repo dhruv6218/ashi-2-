@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { AppLayout } from '../../layouts/AppLayout';
 import { GitCompare, Sparkles, ArrowRight, Loader2, CheckCircle2, Quote, X, Zap } from 'lucide-react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { useOpportunityStore } from '../../store/useOpportunityStore';
+import { useOpportunity, api } from '../../lib/api';
 import { useToast } from '../../contexts/ToastContext';
 import { AIBadge } from '../../components/ui/AIBadge';
 
 export const OpportunityDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { currentOpportunity, isLoading, fetchOpportunityDetails } = useOpportunityStore();
+  const { data: currentOpportunity, isLoading } = useOpportunity(id);
   const { addToast } = useToast();
 
   const [activeTab, setActiveTab] = useState('overview');
@@ -17,10 +17,6 @@ export const OpportunityDetail = () => {
   const [decisionAction, setDecisionAction] = useState('Build');
   const [decisionRationale, setDecisionRationale] = useState('');
   const [isSavingDecision, setIsSavingDecision] = useState(false);
-
-  useEffect(() => {
-    if (id) fetchOpportunityDetails(id);
-  }, [id, fetchOpportunityDetails]);
 
   const formatCurrency = (v: number) => {
     if (v >= 1000000) return `$${(v / 1000000).toFixed(1)}M`;

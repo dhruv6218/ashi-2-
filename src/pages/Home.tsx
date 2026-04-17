@@ -12,20 +12,16 @@ import { EngineSection } from '../components/sections/EngineSection';
 import { DecisionLabSection } from '../components/sections/DecisionLabSection';
 import { ArtifactSection } from '../components/sections/ArtifactSection';
 import { PostLaunchSection } from '../components/sections/PostLaunchSection';
-import { AskAssistantSection } from '../components/sections/AskAssistantSection';
-import { DigestSection } from '../components/sections/DigestSection';
 import { MainLayout } from '../layouts/MainLayout';
 
 export const Home = () => {
   const location = useLocation();
 
-  // Handle smooth scroll to hash links when navigating from other pages
   useEffect(() => {
     if (location.hash) {
       const id = location.hash.replace('#', '');
       const element = document.getElementById(id);
       if (element) {
-        // Small delay to ensure the DOM is fully rendered before scrolling
         setTimeout(() => {
           element.scrollIntoView({ behavior: 'smooth' });
         }, 100);
@@ -49,8 +45,6 @@ export const Home = () => {
       <DecisionLabSection />
       <ArtifactSection />
       <PostLaunchSection />
-      <AskAssistantSection />
-      <DigestSection />
     </MainLayout>
   );
 };

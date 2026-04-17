@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, Search, Layers, TrendingUp, CheckCircle, 
-  MessageCircle, Plug, Settings, LogOut, Bell, Menu, X, ChevronDown, Check, Plus,
-  FileText, Rocket
+  Settings, LogOut, Bell, Menu, X, ChevronDown, Check, Plus,
+  FileText, Rocket, Building2
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
@@ -46,16 +46,16 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, title, subtitle,
     navigate('/login');
   };
 
+  // Strictly MVP Core Loop Navigation
   const navItems = [
-    { name: 'Home', path: '/app', icon: LayoutDashboard },
+    { name: 'Dashboard', path: '/app', icon: LayoutDashboard },
     { name: 'Signals', path: '/app/signals', icon: Search },
+    { name: 'Accounts', path: '/app/accounts', icon: Building2 },
     { name: 'Problems', path: '/app/problems', icon: Layers },
     { name: 'Opportunities', path: '/app/opportunities', icon: TrendingUp },
     { name: 'Decisions', path: '/app/decisions', icon: CheckCircle },
     { name: 'Artifacts', path: '/app/artifacts', icon: FileText },
     { name: 'Launches', path: '/app/launches', icon: Rocket },
-    { name: 'Ask AI', path: '/app/ask', icon: MessageCircle },
-    { name: 'Integrations', path: '/app/integrations', icon: Plug },
     { name: 'Settings', path: '/app/settings', icon: Settings },
   ];
 
@@ -99,7 +99,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, title, subtitle,
                 <span className="text-sm font-bold text-white leading-tight truncate w-full text-left">
                   {isLoadingWorkspace ? 'Loading...' : wsName}
                 </span>
-                <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Free Plan</span>
+                <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Workspace</span>
               </div>
             </div>
             <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${isWorkspaceDropdownOpen ? 'rotate-180' : ''}`} />
@@ -129,15 +129,6 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, title, subtitle,
                     {activeWorkspace?.id === ws.id && <Check className="w-4 h-4 text-astrix-teal shrink-0 ml-2" />}
                   </button>
                 ))}
-              </div>
-              <div className="border-t border-slate-700 p-2">
-                <Link
-                  to="/onboarding/step-1"
-                  className="w-full flex items-center gap-2 px-4 py-2 text-sm font-bold text-slate-300 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
-                  onClick={() => setIsWorkspaceDropdownOpen(false)}
-                >
-                  <Plus className="w-4 h-4" /> Create Workspace
-                </Link>
               </div>
             </div>
           )}

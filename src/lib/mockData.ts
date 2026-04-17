@@ -57,11 +57,3 @@ export const MOCK_MEMBERS = [
 export const MOCK_INTEGRATIONS = [
   { id: 'int-1', workspace_id: 'ws-1', provider: 'jira', status: 'connected' as const, config: { defaultProjectId: 'PROJ-1', defaultIssueTypeId: '10001' }, updated_at: new Date().toISOString() }
 ];
-
-export const MOCK_CHANGELOGS = [
-  { id: 'cl-1', workspace_id: 'ws-1', title: 'Added Dark Mode', description: 'You asked, we delivered. Dark mode is now available in settings.', tag: 'Feature', created_at: new Date().toISOString(), updated_at: new Date().toISOString() }
-];
-
-export const MOCK_AUDIT_LOGS = [
-  { id: 'al-1', workspace_id: 'ws-1', user_id: 'user-1', action_type: 'decision_created', description: 'Logged decision to Build SAML SSO', created_at: new Date().toISOString(), users: { full_name: 'Demo User' } }
-];

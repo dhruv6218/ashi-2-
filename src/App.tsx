@@ -5,7 +5,6 @@ import { AuthProvider } from './contexts/AuthContext';
 import { WorkspaceProvider } from './contexts/WorkspaceContext';
 import { ToastProvider } from './contexts/ToastContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
-import { CustomCursor } from './components/ui/CustomCursor';
 import { KeyboardShortcuts } from './components/ui/KeyboardShortcuts';
 
 // Public Pages
@@ -20,7 +19,6 @@ import { Contact } from './pages/Contact';
 import { NotFound } from './pages/NotFound';
 
 // Marketing & Legal Pages
-import { IntegrationsMarketing } from './pages/marketing/IntegrationsMarketing';
 import { PrivacyPolicy } from './pages/legal/PrivacyPolicy';
 import { TermsOfService } from './pages/legal/TermsOfService';
 
@@ -32,7 +30,7 @@ import { Step3Results } from './pages/onboarding/Step3Results';
 // App Pages
 import { Dashboard } from './pages/app/Dashboard';
 import { SignalExplorer } from './pages/app/SignalExplorer';
-import { AskAssistant } from './pages/app/AskAssistant';
+import { AccountsList } from './pages/app/AccountsList';
 import { ProblemsList } from './pages/app/ProblemsList';
 import { ProblemDetail } from './pages/app/ProblemDetail';
 import { OpportunitiesList } from './pages/app/OpportunitiesList';
@@ -43,7 +41,6 @@ import { DecisionDetail } from './pages/app/DecisionDetail';
 import { ArtifactStudio } from './pages/app/ArtifactStudio';
 import { PostLaunchTracker } from './pages/app/PostLaunchTracker';
 import { LaunchDetail } from './pages/app/LaunchDetail';
-import { IntegrationsHub } from './pages/app/IntegrationsHub';
 import { Settings } from './pages/app/Settings';
 
 function App() {
@@ -54,7 +51,6 @@ function App() {
       <AuthProvider>
         <WorkspaceProvider>
           <Router>
-            <CustomCursor />
             <KeyboardShortcuts />
             <Routes>
               {/* Public Pages */}
@@ -68,7 +64,6 @@ function App() {
               <Route path="/accept-invitation" element={<AcceptInvitation />} />
               
               {/* Marketing & Legal */}
-              <Route path="/integrations" element={<IntegrationsMarketing />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/terms" element={<TermsOfService />} />
 
@@ -80,6 +75,7 @@ function App() {
               {/* Protected Main App Routes */}
               <Route path="/app" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/app/signals" element={<ProtectedRoute><SignalExplorer /></ProtectedRoute>} />
+              <Route path="/app/accounts" element={<ProtectedRoute><AccountsList /></ProtectedRoute>} />
               
               <Route path="/app/problems" element={<ProtectedRoute><ProblemsList /></ProtectedRoute>} />
               <Route path="/app/problems/:id" element={<ProtectedRoute><ProblemDetail /></ProtectedRoute>} />
@@ -96,9 +92,6 @@ function App() {
               <Route path="/app/launches" element={<ProtectedRoute><PostLaunchTracker /></ProtectedRoute>} />
               <Route path="/app/launches/:id" element={<ProtectedRoute><LaunchDetail /></ProtectedRoute>} />
               
-              <Route path="/app/ask" element={<ProtectedRoute><AskAssistant /></ProtectedRoute>} />
-              
-              <Route path="/app/integrations" element={<ProtectedRoute><IntegrationsHub /></ProtectedRoute>} />
               <Route path="/app/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
               
               {/* Catch all 404 */}

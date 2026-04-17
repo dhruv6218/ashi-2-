@@ -14,33 +14,34 @@ export const ClaritySection = () => {
       </div>
 
       <div className="max-w-[1400px] mx-auto px-6 md:px-12 relative z-10">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 md:mb-32 gap-6 md:gap-10">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 md:mb-24 gap-6 md:gap-10">
           <h2 className="font-heading text-fluid-2 leading-[0.9] tracking-tighter uppercase max-w-3xl">
             From Signal <br/>
             <span className="text-brand-blue">To Shipped.</span>
           </h2>
           <p className="text-lg md:text-xl text-gray-600 max-w-md font-medium">
-            Llama 4 Maverick reads every ticket, normalizes the text, and clusters them into Canonical Problems automatically.
+            The complete accountability loop. Astrix reads the noise, scores the impact, and tracks whether your decisions actually worked.
           </p>
         </div>
 
-        {/* Abstract Process Flow */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 relative">
-          {/* Connecting Line */}
-          <div className="hidden md:block absolute top-1/2 left-0 w-full h-[2px] bg-gray-200 -translate-y-1/2 z-0"></div>
+        {/* Abstract Process Flow - 6 Steps matching MVP Core Loop */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 relative">
+          {/* Connecting Line (Desktop only) */}
+          <div className="hidden lg:block absolute top-1/2 left-0 w-full h-[2px] bg-gray-200 -translate-y-1/2 z-0"></div>
           
           {[
-            { step: "01", title: "Ingest", desc: "Connect every tool" },
-            { step: "02", title: "Cluster", desc: "AI groups signals" },
-            { step: "03", title: "Score", desc: "Account-aware math" },
-            { step: "04", title: "Decide", desc: "Compare & commit" },
-            { step: "05", title: "Ship", desc: "PRDs generated" }
+            { step: "01", title: "Signals", desc: "Ingest feedback & CSVs" },
+            { step: "02", title: "Problems", desc: "AI clusters the noise" },
+            { step: "03", title: "Opportunities", desc: "Score by ARR & pain" },
+            { step: "04", title: "Decisions", desc: "Compare and commit" },
+            { step: "05", title: "Launches", desc: "Ship & track metrics" },
+            { step: "06", title: "Verdicts", desc: "Prove it worked" }
           ].map((item, i) => (
-            <div key={i} className={`relative z-10 bg-white p-6 md:p-8 border border-gray-200 shadow-lg shadow-gray-200/50 rounded-2xl hover:border-brand-blue transition-colors duration-500 group flex flex-col justify-between h-48 md:h-64 transform transition-transform duration-700 delay-${i * 100} ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}`}>
-              <div className="text-sm font-mono text-gray-400 font-bold">{item.step}</div>
+            <div key={i} className={`relative z-10 bg-white p-5 md:p-6 border border-gray-200 shadow-lg shadow-gray-200/50 rounded-2xl hover:border-brand-blue transition-colors duration-500 group flex flex-col justify-between h-40 md:h-56 transform transition-transform duration-700 delay-${i * 100} ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}`}>
+              <div className="text-xs md:text-sm font-mono text-gray-400 font-bold">{item.step}</div>
               <div>
-                <h3 className="text-xl md:text-2xl font-heading font-bold mb-2 group-hover:text-brand-blue transition-colors">{item.title}</h3>
-                <p className="text-xs md:text-sm text-gray-500 font-medium">{item.desc}</p>
+                <h3 className="text-lg md:text-xl font-heading font-bold mb-1 md:mb-2 group-hover:text-brand-blue transition-colors">{item.title}</h3>
+                <p className="text-[10px] md:text-xs text-gray-500 font-medium leading-snug">{item.desc}</p>
               </div>
               {/* Hover Fill Effect */}
               <div className="absolute bottom-0 left-0 w-full h-0 bg-brand-blue/5 group-hover:h-full transition-all duration-500 -z-10 rounded-2xl"></div>

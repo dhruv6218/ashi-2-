@@ -3,16 +3,18 @@ import { AppLayout } from '../../layouts/AppLayout';
 import { Link, useParams } from 'react-router-dom';
 import {
   Quote, Filter, TrendingUp, ArrowLeft, BarChart3,
-  AlertCircle, Flag, Clock, Search, Building2
+  AlertCircle, Flag, Clock, Search, Building2, Loader2
 } from 'lucide-react';
 import { AIBadge } from '../../components/ui/AIBadge';
 import { useToast } from '../../contexts/ToastContext';
-import { useProblemStore } from '../../store/useProblemStore';
+import { useProblem } from '../../lib/api';
 
 export const EvidenceView = () => {
   const { problemId } = useParams<{ problemId: string }>();
   const { addToast } = useToast();
-  const { problemSignals } = useProblemStore();
+  const { data, isLoading } = useProblem(problemId);
+  
+  const problemSignals = data?.signals || [];
   
   const [searchQuery, setSearchQuery] = useState('');
   const [filterSeverity, setFilterSeverity] = useState('All');
@@ -33,6 +35,14 @@ export const EvidenceView = () => {
       addToast('Signal flagged as irrelevant.', 'success');
     }
   };
+
+  if (isLoading) {
+    return (
+      <AppLayout title="Loading Evidence..." subtitle="Fetching signals">
+        <div className="flex items-center justify-center h-64"><Loader2 className="w-8 h-8 animate-spin text-brand-blue" /></div>
+      </AppLayout>
+    );
+  }
 
   const criticalCount = problemSignals.filter(s => s.severity_label === 'Critical').length;
   const highCount = problemSignals.filter(s => s.severity_label === 'High').length;

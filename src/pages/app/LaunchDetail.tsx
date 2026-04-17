@@ -1,20 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { AppLayout } from '../../layouts/AppLayout';
-import { Link, useParams, useNavigate } from 'react-router-dom';
-import {
-  Rocket, CheckCircle2, Clock, ArrowLeft, LayoutGrid, Save, Loader2
-} from 'lucide-react';
+import { Link, useParams } from 'react-router-dom';
+import { Rocket, CheckCircle2, Clock, ArrowLeft, Save, Loader2, Sparkles } from 'lucide-react';
 import { useToast } from '../../contexts/ToastContext';
-import { useLaunchStore } from '../../store/useLaunchStore';
+import { useLaunches, api } from '../../lib/api';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
-import { posthog } from '../../lib/instrument';
 
 export const LaunchDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { addToast } = useToast();
-  const navigate = useNavigate();
   const { activeWorkspace } = useWorkspace();
-  const { launches, fetchLaunches, updateLaunch } = useLaunchStore();
+  const { data: launches } = useLaunches(activeWorkspace?.id);
 
   const [formData, setFormData] = useState({ 
     expected_outcome: '', 
@@ -24,12 +20,6 @@ export const LaunchDetail = () => {
     notes: '' 
   });
   const [isSaving, setIsSaving] = useState(false);
-
-  useEffect(() => {
-    if (activeWorkspace) {
-      fetchLaunches(activeWorkspace.id);
-    }
-  }, [activeWorkspace, fetchLaunches]);
 
   const launch = launches.find(l => l.id === id);
 
@@ -49,18 +39,14 @@ export const LaunchDetail = () => {
     if (!id || !activeWorkspace) return;
     setIsSaving(true);
     try {
-      await updateLaunch(id, {
+      await api.launches.update(id, {
         expected_outcome: formData.expected_outcome,
         before_count: parseInt(formData.before_count) || 0,
         after_count: parseInt(formData.after_count) || 0,
         pm_verdict: formData.pm_verdict,
         notes: formData.notes
       });
-      
-      posthog.capture('launch_logged', { workspace_id: activeWorkspace.id, verdict: formData.pm_verdict });
-      
       addToast(`Launch outcome saved successfully!`, 'success');
-      navigate('/app/launches');
     } catch (err: any) {
       addToast(err.message || "Failed to save outcome", "error");
     } finally {
@@ -82,7 +68,6 @@ export const LaunchDetail = () => {
         </Link>
       }
     >
-      {/* Launch Header Card */}
       <div className="bg-white border border-gray-200 rounded-2xl p-6 md:p-8 shadow-sm mb-8">
         <div className="flex flex-wrap items-start justify-between gap-6">
           <div>
@@ -102,8 +87,6 @@ export const LaunchDetail = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
-
-          {/* Simple Outcome Form */}
           <div className="bg-white border border-gray-200 rounded-2xl p-6 md:p-8 shadow-sm">
             <h3 className="font-heading text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
               <CheckCircle2 className="w-5 h-5 text-astrix-teal" /> Record Outcome
@@ -127,7 +110,6 @@ export const LaunchDetail = () => {
                     type="number" 
                     value={formData.before_count} 
                     onChange={e => setFormData({ ...formData, before_count: e.target.value })} 
-                    placeholder="e.g. 45" 
                     className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-astrix-teal" 
                   />
                 </div>
@@ -137,24 +119,23 @@ export const LaunchDetail = () => {
                     type="number" 
                     value={formData.after_count} 
                     onChange={e => setFormData({ ...formData, after_count: e.target.value })} 
-                    placeholder="e.g. 12" 
                     className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-astrix-teal" 
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">PM Verdict</label>
+                <label className="block text-sm font-bold text-gray-700 mb-2">Final Verdict</label>
                 <select 
                   value={formData.pm_verdict} 
                   onChange={e => setFormData({ ...formData, pm_verdict: e.target.value })} 
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-astrix-teal"
                 >
                   <option value="">Select verdict...</option>
-                  <option value="positive">✅ Solved the problem</option>
-                  <option value="partial">⚠️ Partially solved</option>
-                  <option value="negative">❌ Did not solve</option>
-                  <option value="worse">🚨 Made things worse</option>
+                  <option value="Solved">✅ Solved</option>
+                  <option value="Partially Solved">⚠️ Partially Solved</option>
+                  <option value="Not Solved">❌ Not Solved</option>
+                  <option value="Regressed">🚨 Regressed</option>
                 </select>
               </div>
 
@@ -163,7 +144,6 @@ export const LaunchDetail = () => {
                 <textarea 
                   value={formData.notes} 
                   onChange={e => setFormData({ ...formData, notes: e.target.value })} 
-                  placeholder="Qualitative observations, customer feedback, context..." 
                   className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-astrix-teal resize-none min-h-[100px]" 
                 />
               </div>
@@ -180,9 +160,32 @@ export const LaunchDetail = () => {
               </div>
             </div>
           </div>
+
+          {launch.pm_verdict && (
+            <div className="bg-gradient-to-br from-astrix-teal/10 to-blue-50 border border-astrix-teal/20 rounded-2xl p-6 md:p-8 shadow-sm animate-[fadeIn_0.5s_ease-out]">
+              <h3 className="font-heading text-lg font-bold text-astrix-teal mb-4 flex items-center gap-2">
+                <Sparkles className="w-5 h-5" /> Auto-Generated Proof Summary
+              </h3>
+              <div className="bg-white/60 border border-white rounded-xl p-5 space-y-4">
+                <p className="text-gray-800 font-medium">
+                  <strong>Decision:</strong> The team decided to {launch.action} <em>{launch.title}</em>.
+                </p>
+                <p className="text-gray-800 font-medium">
+                  <strong>Outcome:</strong> After the measurement window, the final verdict is <span className="font-bold text-gray-900">{launch.pm_verdict}</span>.
+                </p>
+                <p className="text-gray-800 font-medium">
+                  <strong>Metrics:</strong> The signal count changed from <span className="font-bold">{launch.before_count || 0}</span> to <span className="font-bold">{launch.after_count || 0}</span>.
+                </p>
+                {launch.notes && (
+                  <div className="pt-3 border-t border-gray-200/50">
+                    <p className="text-gray-600 text-sm italic">"{launch.notes}"</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Right Sidebar */}
         <div className="space-y-6">
           <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
             <h3 className="font-heading text-sm font-bold text-gray-900 mb-4 uppercase tracking-widest">Launch Metadata</h3>
@@ -202,13 +205,6 @@ export const LaunchDetail = () => {
                 <span className="font-bold text-gray-900">{new Date(launch.launched_at).toLocaleDateString()}</span>
               </div>
             </div>
-          </div>
-
-          <div className="bg-astrix-teal/5 border border-astrix-teal/20 rounded-2xl p-5">
-            <h4 className="font-heading text-sm font-bold text-astrix-teal mb-2">Learning Loop</h4>
-            <p className="text-xs text-gray-600 font-medium leading-relaxed">
-              Post-launch tracking closes the loop between your decision and its real-world outcome. Use this data to sharpen future opportunity scoring.
-            </p>
           </div>
         </div>
       </div>

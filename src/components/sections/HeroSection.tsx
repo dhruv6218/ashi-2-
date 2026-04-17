@@ -1,11 +1,10 @@
 import React from 'react';
-import { ArrowRight, Sparkles, Activity } from 'lucide-react';
+import { ArrowRight, Sparkles, Activity, PlayCircle } from 'lucide-react';
 import { useScrollReveal } from '../../hooks/useScrollReveal';
 import { useMouseTilt } from '../../hooks/use3DEffects';
 import { useMouseParallax } from '../../hooks/useMouseParallax';
 import { MagneticButton } from '../ui/MagneticButton';
 import { Link } from 'react-router-dom';
-import { InstallPrompt } from '../InstallPrompt';
 
 export const HeroSection = () => {
   const { ref, isVisible } = useScrollReveal();
@@ -25,18 +24,22 @@ export const HeroSection = () => {
       <div className="w-full px-4 sm:px-6 md:px-12 relative z-10 flex flex-col items-center text-center mt-10">
         
         {/* Massive Editorial Typography */}
-        <div className="relative w-full max-w-[1400px] mx-auto flex flex-col items-center justify-center mb-12 md:mb-16">
-          {/* 
-            FIX: Adjusted font size to 9.5vw on mobile to perfectly fit narrow screens (like iPhone SE) without horizontal cut-off.
-            Added whitespace-nowrap to ensure the word never breaks.
-          */}
-          <h1 className="font-heading text-[9.5vw] sm:text-fluid-3 leading-[1.1] sm:leading-[0.85] tracking-tighter font-black text-gray-900 uppercase m-0 p-0 relative z-20 w-full whitespace-nowrap">
-            <span className="block overflow-hidden pb-2 sm:pb-4"><span className={`block transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${isVisible ? 'translate-y-0' : 'translate-y-[120%]'}`}>Stop</span></span>
-            <span className="block overflow-hidden pb-4 sm:pb-8"><span className={`block text-brand-blue transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] delay-75 ${isVisible ? 'translate-y-0' : 'translate-y-[120%]'}`}>Guessing.</span></span>
+        <div className="relative w-full max-w-[1000px] mx-auto flex flex-col items-center justify-center mb-12 md:mb-16">
+          <h1 className="font-heading text-4xl sm:text-6xl md:text-7xl lg:text-[5.5rem] leading-[1.1] sm:leading-none tracking-tighter font-black text-gray-900 uppercase m-0 p-0 relative z-20 w-full">
+            <span className="block overflow-hidden pb-1 sm:pb-2">
+              <span className={`block transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${isVisible ? 'translate-y-0' : 'translate-y-[120%]'}`}>
+                Your Product <br className="sm:hidden" /> Brain,
+              </span>
+            </span>
+            <span className="block overflow-hidden pb-2 sm:pb-4">
+              <span className={`block text-brand-blue transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] delay-75 ${isVisible ? 'translate-y-0' : 'translate-y-[120%]'}`}>
+                Organized.
+              </span>
+            </span>
           </h1>
           
-          <p className={`mt-6 md:mt-8 text-lg md:text-2xl text-gray-500 font-medium max-w-2xl px-4 sm:px-0 transition-all duration-700 delay-150 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            The intelligence engine for B2B SaaS. Turn raw signals into evidence-backed product decisions.
+          <p className={`mt-6 md:mt-8 text-lg md:text-xl lg:text-2xl text-gray-500 font-medium max-w-3xl px-4 sm:px-0 transition-all duration-700 delay-150 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            Connect signals, problems, opportunities, decisions, and launches in one AI workspace. Start every roadmap conversation with hard customer evidence, not scattered docs.
           </p>
         </div>
 
@@ -85,7 +88,7 @@ export const HeroSection = () => {
                     </div>
                     <div>
                       <div className="text-white font-bold text-sm md:text-base flex items-center gap-2">
-                        Groq AI Insight <span className="flex h-2 w-2 relative"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-yellow opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-brand-yellow"></span></span>
+                        Clustered Problem <span className="flex h-2 w-2 relative"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-yellow opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-brand-yellow"></span></span>
                       </div>
                       <div className="text-gray-400 font-mono text-[10px] md:text-xs mt-1">Found 84 signals indicating Onboarding friction.</div>
                     </div>
@@ -127,20 +130,20 @@ export const HeroSection = () => {
         </div>
 
         {/* CTA Area */}
-        <div className={`mt-16 md:mt-20 flex flex-col items-center transition-all duration-700 delay-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+        <div className={`mt-16 md:mt-20 flex flex-col items-center transition-all duration-700 delay-500 w-full ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-center w-full px-4 sm:px-0">
             <MagneticButton strength={0.2} className="w-full sm:w-auto">
-              <Link to="/signup" className="w-full sm:w-auto bg-brand-blue text-white px-8 md:px-10 py-3.5 md:py-4 rounded-full font-semibold text-base md:text-lg hover:bg-gray-900 transition-all duration-300 flex items-center justify-center gap-3 group shadow-glow-blue btn-shine focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-blue focus-visible:ring-offset-2">
-                Start Building Smarter <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              <Link to="/signup?demo=true" className="w-full sm:w-auto bg-brand-blue text-white px-8 md:px-10 py-3.5 md:py-4 rounded-full font-semibold text-base md:text-lg hover:bg-gray-900 transition-all duration-300 flex items-center justify-center gap-3 group shadow-glow-blue btn-shine focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-blue focus-visible:ring-offset-2">
+                Explore a sample workspace <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </MagneticButton>
-            
-            <InstallPrompt 
-              className="w-full sm:w-auto bg-white text-gray-900 border border-gray-200 px-8 md:px-10 py-3.5 md:py-4 rounded-full font-semibold text-base md:text-lg hover:bg-gray-50 transition-all duration-300 flex items-center justify-center gap-3 shadow-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-gray-200 focus-visible:ring-offset-2"
-              text="Install App"
-            />
+            <MagneticButton strength={0.1} className="w-full sm:w-auto">
+              <button className="w-full sm:w-auto bg-white text-gray-900 border border-gray-200 px-8 md:px-10 py-3.5 md:py-4 rounded-full font-semibold text-base md:text-lg hover:bg-gray-50 transition-all duration-300 flex items-center justify-center gap-3 shadow-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-gray-200 focus-visible:ring-offset-2">
+                <PlayCircle className="w-5 h-5 text-brand-blue" /> Watch the 3-minute demo
+              </button>
+            </MagneticButton>
           </div>
-          <span className="text-xs md:text-sm text-gray-400 font-medium mt-6 text-center">Free plan available • No credit card required</span>
+          <span className="text-xs md:text-sm text-gray-400 font-medium mt-6 text-center">Every decision traced back to real customer signals.</span>
         </div>
 
       </div>

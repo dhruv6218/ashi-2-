@@ -1,22 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { AppLayout } from '../../layouts/AppLayout';
 import { Link } from 'react-router-dom';
-import {
-  Rocket, CheckCircle2, Clock, AlertTriangle, Activity, Plus, ChevronRight
-} from 'lucide-react';
+import { Rocket, Clock, Plus, ChevronRight } from 'lucide-react';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { Skeleton } from '../../components/ui/Skeleton';
-import { useLaunchStore } from '../../store/useLaunchStore';
+import { useLaunches } from '../../lib/api';
 
 export const PostLaunchTracker = () => {
   const { activeWorkspace } = useWorkspace();
-  const { launches, isLoading, fetchLaunches } = useLaunchStore();
-
-  useEffect(() => {
-    if (activeWorkspace) {
-      fetchLaunches(activeWorkspace.id);
-    }
-  }, [activeWorkspace, fetchLaunches]);
+  const { data: launches, isLoading } = useLaunches(activeWorkspace?.id);
 
   const formatDate = (iso: string) => new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
@@ -30,7 +22,6 @@ export const PostLaunchTracker = () => {
         </Link>
       }
     >
-      {/* Launch List */}
       {isLoading ? (
         <div className="space-y-4">
           <Skeleton className="w-full h-24" />
@@ -49,7 +40,7 @@ export const PostLaunchTracker = () => {
             <div key={launch.id} className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all group flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div>
                 <div className="flex items-center gap-3 mb-2 flex-wrap">
-                  <h3 className="font-heading text-xl font-bold text-gray-900">Launch Record</h3>
+                  <h3 className="font-heading text-xl font-bold text-gray-900">{launch.title}</h3>
                   <span className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border bg-blue-50 text-brand-blue border-blue-200">
                     Tracked
                   </span>

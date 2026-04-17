@@ -1,6 +1,6 @@
 import React from 'react';
 import { useScrollReveal } from '../../hooks/useScrollReveal';
-import { Database, Hash, MessageCircle, FileSpreadsheet } from 'lucide-react';
+import { Database, Hash, CheckSquare, FileSpreadsheet } from 'lucide-react';
 
 export const IngestionSection = () => {
   const { ref, isVisible } = useScrollReveal(0.2);
@@ -25,7 +25,7 @@ export const IngestionSection = () => {
           <div className="flex flex-row md:flex-col gap-4 md:gap-6 w-full md:w-1/4 relative z-10 justify-center">
             {[
               { icon: Hash, name: "Slack", color: "text-pink-600" },
-              { icon: MessageCircle, name: "Discord", color: "text-indigo-500" },
+              { icon: CheckSquare, name: "Jira", color: "text-blue-600" },
               { icon: FileSpreadsheet, name: "CSV", color: "text-gray-700" }
             ].map((source, i) => (
               <div key={i} className={`bg-white border border-gray-100 shadow-lg shadow-gray-200/50 p-3 md:p-4 rounded-xl flex items-center gap-2 md:gap-4 transform transition-all duration-700 delay-${i * 200} ${isVisible ? 'translate-x-0 opacity-100' : '-translate-x-20 opacity-0'}`}>

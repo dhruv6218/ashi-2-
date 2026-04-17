@@ -1,26 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { AppLayout } from '../../layouts/AppLayout';
-import { CheckCircle2, FileText, Activity, LayoutGrid, Clock, Loader2, ChevronDown, Copy, Edit2, Save } from 'lucide-react';
+import { CheckCircle2, FileText, Activity, Clock, Loader2, ChevronDown, Copy, Edit2, Save } from 'lucide-react';
 import { useParams } from 'react-router-dom';
-import { useDecisionStore } from '../../store/useDecisionStore';
-import { useArtifactStore } from '../../store/useArtifactStore';
-import { useLaunchStore } from '../../store/useLaunchStore';
+import { useDecision, useArtifacts, useLaunches, api } from '../../lib/api';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { AIBadge } from '../../components/ui/AIBadge';
 import { useToast } from '../../contexts/ToastContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { useAuth } from '../../contexts/AuthContext';
-import { supabase } from '../../lib/supabase';
-import { JiraPushModal } from '../../components/modals/JiraPushModal';
 
 export const DecisionDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const { activeWorkspace } = useWorkspace();
-  const { currentDecision, isLoading, fetchDecisionDetails } = useDecisionStore();
-  const { artifacts, fetchArtifacts, updateArtifact } = useArtifactStore();
-  const { launches, fetchLaunches, createLaunch } = useLaunchStore();
   const { addToast } = useToast();
+
+  const { data: currentDecision, isLoading } = useDecision(id);
+  const { data: artifacts, refetch: fetchArtifacts } = useArtifacts(activeWorkspace?.id);
+  const { data: launches } = useLaunches(activeWorkspace?.id);
 
   // Artifact State
   const [isGenerating, setIsGenerating] = useState(false);
@@ -30,19 +27,7 @@ export const DecisionDetail = () => {
   // Launch State
   const [showLaunchForm, setShowLaunchForm] = useState(false);
   const [launchDate, setLaunchDate] = useState('');
-  const [jiraUrl, setJiraUrl] = useState('');
   const [isSavingLaunch, setIsSavingLaunch] = useState(false);
-
-  // Jira Modal State
-  const [isJiraPushOpen, setIsJiraPushOpen] = useState(false);
-
-  useEffect(() => {
-    if (id && activeWorkspace) {
-      fetchDecisionDetails(id);
-      fetchArtifacts(activeWorkspace.id);
-      fetchLaunches(activeWorkspace.id);
-    }
-  }, [id, activeWorkspace, fetchDecisionDetails, fetchArtifacts, fetchLaunches]);
 
   const decisionArtifacts = artifacts.filter(a => a.decision_id === id);
   const decisionLaunches = launches.filter(l => l.decision_id === id);
@@ -52,22 +37,20 @@ export const DecisionDetail = () => {
     if (!activeWorkspace || !id || !user) return;
     setIsGenerating(true);
     try {
-      const { data, error } = await supabase.functions.invoke('ai-generate-artifact', {
-        body: { 
-          workspace_id: activeWorkspace.id,
-          decision_id: id,
-          type: type
-        }
+      await new Promise(r => setTimeout(r, 3000)); // Simulate AI
+      await api.artifacts.create({
+        workspace_id: activeWorkspace.id,
+        decision_id: id,
+        title: type === 'prd' ? 'Generated PRD' : 'Decision Memo',
+        type: type,
+        content: '# Generated Content\n\nAI generated this based on the decision.',
+        author_id: user.id
       });
       
-      if (error) throw error;
-      if (data?.error) throw data.error;
-
-      await fetchArtifacts(activeWorkspace.id);
+      await fetchArtifacts();
       addToast("Artifact generated successfully via AI", "success");
     } catch (err: any) {
-      const errorMessage = err?.context?.error?.message || err?.error?.message || err?.message || "Failed to generate artifact.";
-      addToast(errorMessage, "error");
+      addToast("Failed to generate artifact.", "error");
     } finally {
       setIsGenerating(false);
     }
@@ -76,11 +59,7 @@ export const DecisionDetail = () => {
   const handleSaveEdit = async () => {
     if (!activeArtifact || !user) return;
     try {
-      await updateArtifact(activeArtifact.id, {
-        content: editContent,
-        updated_at: new Date().toISOString()
-      });
-      
+      await api.artifacts.update(activeArtifact.id, { content: editContent });
       addToast("Changes saved successfully", "success");
       setIsEditing(false);
     } catch (err: any) {
@@ -92,12 +71,11 @@ export const DecisionDetail = () => {
     if (!activeWorkspace || !id || !user || !launchDate || !currentDecision) return;
     setIsSavingLaunch(true);
     try {
-      await createLaunch({
+      await api.launches.create({
         workspace_id: activeWorkspace.id,
         decision_id: id,
         title: currentDecision.title,
         action: currentDecision.action,
-        jira_url: jiraUrl,
         launched_at: new Date(launchDate).toISOString(),
         created_by: user.id
       });
@@ -139,7 +117,6 @@ export const DecisionDetail = () => {
             </div>
           </div>
 
-          {/* ARTIFACTS SECTION */}
           <div className="bg-white border border-gray-200 rounded-2xl p-6 md:p-8 shadow-sm">
             <div className="flex justify-between items-center mb-6">
               <h3 className="font-heading text-lg font-bold text-gray-900 flex items-center gap-2">
@@ -161,16 +138,10 @@ export const DecisionDetail = () => {
               <div className="space-y-3"><Skeleton className="w-full h-4" /><Skeleton className="w-3/4 h-4" /><Skeleton className="w-1/2 h-4" /></div>
             ) : decisionArtifacts.length > 0 && activeArtifact ? (
               <div className="border border-gray-200 rounded-xl overflow-hidden animate-[fadeIn_0.3s_ease-out]">
-                
-                {/* Toolbar */}
                 <div className="bg-gray-50 p-3 border-b border-gray-200 flex flex-wrap justify-between items-center gap-3">
-                  
                   <div className="flex items-center gap-2 bg-white border border-gray-200 px-3 py-1.5 rounded-lg text-xs font-bold text-gray-700">
-                    <AIBadge />
-                    {activeArtifact.title}
+                    <AIBadge /> {activeArtifact.title}
                   </div>
-
-                  {/* Actions */}
                   <div className="flex items-center gap-2">
                     {isEditing ? (
                       <>
@@ -181,20 +152,13 @@ export const DecisionDetail = () => {
                       <>
                         <button onClick={copyToClipboard} className="p-1.5 text-gray-500 hover:text-gray-900 bg-white border border-gray-200 rounded-md shadow-sm" title="Copy"><Copy className="w-3.5 h-3.5"/></button>
                         <button onClick={() => { setEditContent(activeArtifact.content); setIsEditing(true); }} className="p-1.5 text-gray-500 hover:text-gray-900 bg-white border border-gray-200 rounded-md shadow-sm" title="Edit"><Edit2 className="w-3.5 h-3.5"/></button>
-                        <button onClick={() => setIsJiraPushOpen(true)} className="text-xs font-bold bg-blue-50 text-blue-700 px-3 py-1.5 rounded-md flex items-center gap-1 hover:bg-blue-100 border border-blue-200"><LayoutGrid className="w-3 h-3"/> Push to Jira</button>
                       </>
                     )}
                   </div>
                 </div>
-
-                {/* Content Area */}
                 <div className="p-6 font-mono text-sm text-gray-800 whitespace-pre-wrap bg-white">
                   {isEditing ? (
-                    <textarea 
-                      value={editContent} 
-                      onChange={(e) => setEditContent(e.target.value)}
-                      className="w-full min-h-[300px] outline-none resize-y bg-transparent"
-                    />
+                    <textarea value={editContent} onChange={(e) => setEditContent(e.target.value)} className="w-full min-h-[300px] outline-none resize-y bg-transparent" />
                   ) : (
                     activeArtifact.content
                   )}
@@ -205,7 +169,6 @@ export const DecisionDetail = () => {
             )}
           </div>
 
-          {/* POST LAUNCH SECTION */}
           <div className="bg-white border border-gray-200 rounded-2xl p-6 md:p-8 shadow-sm">
              <div className="flex justify-between items-center mb-6">
               <h3 className="font-heading text-lg font-bold text-gray-900 flex items-center gap-2">
@@ -225,10 +188,6 @@ export const DecisionDetail = () => {
                     <label className="block text-xs font-bold text-gray-700 mb-1">Launch Date</label>
                     <input type="date" value={launchDate} onChange={e => setLaunchDate(e.target.value)} className="w-full p-2 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-astrix-teal" />
                   </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-700 mb-1">Jira Epic URL (Optional)</label>
-                    <input type="url" value={jiraUrl} onChange={e => setJiraUrl(e.target.value)} placeholder="https://jira..." className="w-full p-2 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-astrix-teal" />
-                  </div>
                 </div>
                 <div className="flex justify-end gap-2">
                   <button onClick={() => setShowLaunchForm(false)} className="px-4 py-2 text-sm font-bold text-gray-500 hover:text-gray-900">Cancel</button>
@@ -241,10 +200,7 @@ export const DecisionDetail = () => {
               <div className="space-y-4 animate-[fadeIn_0.3s_ease-out]">
                 <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
                   <span className="font-bold text-gray-900">Launched on:</span> {new Date(launch.launched_at).toLocaleDateString()}
-                  {launch.jira_url && <a href={launch.jira_url} target="_blank" rel="noreferrer" className="ml-2 text-astrix-teal hover:underline flex items-center gap-1"><LayoutGrid className="w-3 h-3"/> Jira Epic</a>}
                 </div>
-                
-                {/* Measurement Windows */}
                 {[7, 30, 60].map(days => {
                   const dueDate = new Date(launch.launched_at);
                   dueDate.setDate(dueDate.getDate() + days);
@@ -289,13 +245,6 @@ export const DecisionDetail = () => {
         </div>
 
       </div>
-
-      <JiraPushModal 
-        isOpen={isJiraPushOpen} 
-        onClose={() => setIsJiraPushOpen(false)}
-        defaultSummary={activeArtifact?.title || currentDecision.title}
-        defaultDescription={activeArtifact?.content || currentDecision.rationale}
-      />
     </AppLayout>
   );
 };

@@ -21,48 +21,75 @@ export const Pricing = () => {
       name: "Free",
       price: 0,
       displayPrice: "$0",
-      desc: "For solo founders validating fit. 1 workspace, limited signals, CSV imports only.",
-      features: ["1 Workspace", "500 signals/month", "Basic AI clustering", "Manual exports only", "No external integrations"],
+      period: "forever",
+      desc: "For solo founders and PMs to validate the evidence-based product loop.",
+      features: [
+        "1 Member + 2 Viewers",
+        "1 Workspace",
+        "200 signals (Lifetime total)",
+        "100 AI classifications & 5 memos",
+        "Standard launch reviews"
+      ],
       cta: "Start Free",
       popular: false
     },
     {
       name: "Starter",
-      price: isAnnual ? 49 : 59,
-      displayPrice: isAnnual ? "$49" : "$59",
-      period: "/month",
-      desc: "For early B2B SaaS teams. Full decision engine and basic launches.",
-      features: ["1 Workspace", "2,000 signals/month", "Unlimited AI analyses", "Jira integration", "Push decisions into execution"],
-      cta: "Upgrade to Starter",
+      price: isAnnual ? 588 : 59,
+      displayPrice: isAnnual ? "$588" : "$59",
+      period: isAnnual ? "/year" : "/month",
+      desc: "For early-stage startups establishing their first evidence-based product loop.",
+      features: [
+        "Up to 3 Members + Unlimited Viewers",
+        "1 Workspace",
+        "2,000 signals/month",
+        "500 AI classifications & 20 memos",
+        "Standard launch reviews"
+      ],
+      cta: "Start with Starter",
       popular: false
     },
     {
-      name: "Pro",
-      price: isAnnual ? 199 : 249,
-      displayPrice: isAnnual ? "$199" : "$249",
-      period: "/month",
-      desc: "For growing teams. Multiple workspaces, higher volume, native integrations.",
-      features: ["5 Workspaces", "15,000 signals/month", "Advanced Jira Workflows", "Up to 15 team members", "Priority Support"],
-      cta: "Upgrade to Pro",
+      name: "Growth",
+      price: isAnnual ? 1788 : 179,
+      displayPrice: isAnnual ? "$1,788" : "$179",
+      period: isAnnual ? "/year" : "/month",
+      desc: "The execution engine with automated workflows and AI insights for scaling teams.",
+      features: [
+        "Up to 8 Members + Unlimited Viewers",
+        "1 Workspace",
+        "10,000 signals/month",
+        "Ask Assistant included",
+        "2,500 AI classifications & 100 memos",
+        "Jira Cloud Integration"
+      ],
+      cta: "Upgrade to Growth",
       popular: true
     },
     {
-      name: "Enterprise",
-      price: isAnnual ? 599 : 699,
-      displayPrice: isAnnual ? "$599" : "$699",
-      period: "/month",
-      desc: "Custom volume, SSO, security reviews, and dedicated onboarding.",
-      features: ["Unlimited Workspaces", "Unlimited Signals", "Unlimited team members", "Google Workspace SSO", "Dedicated onboarding"],
-      cta: "Contact Sales",
+      name: "Scale",
+      price: isAnnual ? 4788 : 449,
+      displayPrice: isAnnual ? "$4,788" : "$449",
+      period: isAnnual ? "/year" : "/month",
+      desc: "Self-serve governance and multi-squad standardization for mature SaaS orgs.",
+      features: [
+        "Up to 20 Members + Unlimited Viewers",
+        "Up to 10 Workspaces",
+        "50,000 signals/month",
+        "10k AI classifications & 500 memos",
+        "Ask Assistant (Large limits)",
+        "Full Audit Log & Custom Checkpoints"
+      ],
+      cta: "Upgrade to Scale",
       popular: false
     }
   ];
 
   const faqs = [
     { q: "What counts as a 'signal'?", a: "A signal is any individual piece of feedback ingested into Astrix. This could be a single support ticket, an app store review, or a row in a CSV upload." },
-    { q: "Do I need a credit card to sign up?", a: "No. You can start with our Free plan completely free without entering any payment details." },
-    { q: "How do payments work?", a: "We partner with Dodo Payments as our merchant of record. They securely process all global cards." },
-    { q: "Is Jira integration included in the Free plan?", a: "No, the Jira Cloud integration requires a paid plan (Starter or above) as it utilizes advanced backend workflows to push generated artifacts directly to your engineering backlog." },
+    { q: "What are the user roles?", a: "We keep it simple: Owners (billing & settings), Members (editors who can create decisions and artifacts), and Viewers (free, unlimited users who can read memos and track launch progress in paid plans)." },
+    { q: "How do payments work?", a: "We partner with secure payment providers to process all global cards. You can choose to be billed monthly or annually." },
+    { q: "Is Jira integration included in the Starter plan?", a: "No, the Jira Cloud integration requires the Growth plan or above, as it utilizes advanced backend workflows to push generated artifacts directly to your engineering backlog." },
     { q: "Is my data used to train your AI models?", a: "Absolutely not. We use enterprise APIs with strict zero-retention policies. Your workspace data is isolated and never used for training." },
     { q: "Can I cancel anytime?", a: "Yes, you can cancel your subscription at any time from the billing settings. You will retain access until the end of your current billing period." }
   ];
@@ -70,11 +97,6 @@ export const Pricing = () => {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   const handleCheckout = async (tier: any) => {
-    if (tier.price === 0) {
-      navigate('/signup');
-      return;
-    }
-
     if (!activeWorkspace) {
       addToast("Please log in or create an account to upgrade.", "warning");
       navigate('/signup');
@@ -99,11 +121,8 @@ export const Pricing = () => {
             Simple pricing. <br/>
             <span className="text-brand-blue">Serious value.</span>
           </h1>
-          <p className={`text-lg md:text-xl text-gray-600 font-medium max-w-2xl mx-auto mb-4 transition-all duration-700 delay-100 ${headerVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-            Start with our Free plan and upgrade when you're ready.
-          </p>
-          <p className={`text-sm text-brand-blue font-bold mb-12 transition-all duration-700 delay-100 ${headerVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-            During beta, pricing and limits are flexible for founding teams – talk to us.
+          <p className={`text-lg md:text-xl text-gray-600 font-medium max-w-2xl mx-auto mb-12 transition-all duration-700 delay-100 ${headerVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+            The accountability loop for every stage of growth.
           </p>
 
           {/* Toggle */}
@@ -117,19 +136,19 @@ export const Pricing = () => {
               <div className={`absolute top-1 w-6 h-6 bg-white rounded-full shadow-sm transition-all duration-300 cubic-bezier(0.16,1,0.3,1) ${isAnnual ? 'left-7 bg-brand-blue' : 'left-1'}`}></div>
             </button>
             <span className={`text-sm font-bold flex items-center gap-2 transition-colors ${isAnnual ? 'text-gray-900' : 'text-gray-500'}`}>
-              Annual <span className="bg-green-100 text-green-700 text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">2 Months Free</span>
+              Annual <span className="bg-green-100 text-green-700 text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">Save ~16%</span>
             </span>
           </div>
         </div>
       </div>
 
       {/* Pricing Cards */}
-      <div className="max-w-[1400px] mx-auto px-6 md:px-12 -mt-12 relative z-10 mb-32" ref={cardsRef}>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+      <div className="max-w-[1400px] mx-auto px-4 md:px-8 -mt-12 relative z-10 mb-32" ref={cardsRef}>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {tiers.map((tier, i) => (
             <div 
               key={i} 
-              className={`relative rounded-3xl p-8 flex flex-col transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-2 ${cardsVisible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'} ${tier.popular ? 'bg-brand-blue text-white shadow-glow-blue scale-105 z-20 border-none' : 'bg-white text-gray-900 shadow-apple border border-gray-200'}`}
+              className={`relative rounded-3xl p-6 lg:p-8 flex flex-col transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-2 ${cardsVisible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'} ${tier.popular ? 'bg-brand-blue text-white shadow-glow-blue lg:scale-105 z-20 border-none' : 'bg-white text-gray-900 shadow-apple border border-gray-200'}`}
               style={{ transitionDelay: `${i * 100}ms` }}
             >
               {tier.popular && (
@@ -138,9 +157,9 @@ export const Pricing = () => {
                 </div>
               )}
               <h3 className={`text-xl font-heading font-bold mb-2 ${tier.popular ? 'text-white' : 'text-gray-900'}`}>{tier.name}</h3>
-              <p className={`text-sm mb-6 h-10 font-medium ${tier.popular ? 'text-blue-100' : 'text-gray-500'}`}>{tier.desc}</p>
+              <p className={`text-sm mb-6 h-12 font-medium ${tier.popular ? 'text-blue-100' : 'text-gray-500'}`}>{tier.desc}</p>
               <div className="mb-8">
-                <span className="text-5xl font-heading font-black tracking-tighter">{tier.displayPrice}</span>
+                <span className="text-4xl lg:text-5xl font-heading font-black tracking-tighter">{tier.displayPrice}</span>
                 {tier.period && <span className={`text-sm font-bold ${tier.popular ? 'text-blue-200' : 'text-gray-400'}`}>{tier.period}</span>}
               </div>
               <ul className="space-y-4 mb-8 flex-1">
@@ -154,7 +173,7 @@ export const Pricing = () => {
               <button 
                 onClick={() => handleCheckout(tier)}
                 disabled={loadingTier === tier.name}
-                className={`w-full py-4 rounded-xl font-bold transition-all duration-300 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 flex items-center justify-center gap-2 ${tier.popular ? 'bg-white text-brand-blue hover:bg-gray-50 focus-visible:ring-white shadow-sm' : 'bg-gray-900 text-white hover:bg-brand-blue focus-visible:ring-brand-blue shadow-sm'} disabled:opacity-70`}
+                className={`w-full py-3.5 rounded-xl font-bold transition-all duration-300 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 flex items-center justify-center gap-2 ${tier.popular ? 'bg-white text-brand-blue hover:bg-gray-50 focus-visible:ring-white shadow-sm' : 'bg-gray-900 text-white hover:bg-brand-blue focus-visible:ring-brand-blue shadow-sm'} disabled:opacity-70`}
               >
                 {loadingTier === tier.name ? <Loader2 className="w-5 h-5 animate-spin" /> : tier.cta}
               </button>

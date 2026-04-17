@@ -21,10 +21,6 @@ html.lenis, html.lenis body {
   overflow: hidden;
 }
 
-/* 
-  ENTERPRISE FIX: Removed global cursor: none. 
-  Native cursors are required for accessibility and power-user speed in the dashboard.
-*/
 body {
   background-color: #ffffff;
   color: #111827;
@@ -36,48 +32,6 @@ body {
 ::selection {
   background-color: #1A56FF;
   color: #ffffff;
-}
-
-/* --- Custom Cursor Styles (Now only active on marketing pages) --- */
-.cursor-dot {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 8px;
-  height: 8px;
-  background-color: #1A56FF;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 99999;
-  transform: translate(-50%, -50%);
-  transition: width 0.2s, height 0.2s, background-color 0.2s;
-}
-
-.cursor-ring {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 40px;
-  height: 40px;
-  border: 2px solid rgba(26, 86, 255, 0.4);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 99998;
-  transform: translate(-50%, -50%);
-  transition: width 0.3s, height 0.3s, border-color 0.3s, transform 0.1s ease-out;
-}
-
-.cursor-hover .cursor-dot {
-  width: 12px;
-  height: 12px;
-  background-color: #DC1F3B;
-}
-
-.cursor-hover .cursor-ring {
-  width: 60px;
-  height: 60px;
-  border-color: rgba(220, 31, 59, 0.3);
-  background-color: rgba(220, 31, 59, 0.05);
 }
 
 /* --- Ultra-Subtle Noise Texture --- */

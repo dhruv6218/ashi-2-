@@ -13,7 +13,7 @@ export interface Workspace {
 interface WorkspaceContextType {
   activeWorkspace: Workspace | null;
   workspaces: Workspace[];
-  isLoadingWorkspace: boolean;
+  isWorkspaceInitializing: boolean;
   setActiveWorkspace: (ws: Workspace) => void;
   refreshWorkspaces: () => Promise<void>;
 }
@@ -21,7 +21,7 @@ interface WorkspaceContextType {
 const WorkspaceContext = createContext<WorkspaceContextType>({
   activeWorkspace: null,
   workspaces: [],
-  isLoadingWorkspace: true,
+  isWorkspaceInitializing: true,
   setActiveWorkspace: () => {},
   refreshWorkspaces: async () => {},
 });
@@ -30,32 +30,30 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const { user } = useAuth();
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [activeWorkspace, setActiveWorkspace] = useState<Workspace | null>(null);
-  const [isLoadingWorkspace, setIsLoadingWorkspace] = useState(true);
+  const [isWorkspaceInitializing, setIsWorkspaceInitializing] = useState(true);
 
   const fetchWorkspaces = async () => {
     if (!user) {
       setWorkspaces([]);
       setActiveWorkspace(null);
-      setIsLoadingWorkspace(false);
+      setIsWorkspaceInitializing(false);
       return;
     }
 
-    setIsLoadingWorkspace(true);
+    setIsWorkspaceInitializing(true);
     
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // Simulate Supabase async fetch
+    await new Promise(resolve => setTimeout(resolve, 600));
     
     const fetchedWorkspaces = [MOCK_WORKSPACE];
     setWorkspaces(fetchedWorkspaces);
     setActiveWorkspace(fetchedWorkspaces[0]);
-    localStorage.setItem('astrix_workspace_id', fetchedWorkspaces[0].id);
 
-    setIsLoadingWorkspace(false);
+    setIsWorkspaceInitializing(false);
   };
 
   const handleSetActiveWorkspace = (ws: Workspace) => {
     setActiveWorkspace(ws);
-    localStorage.setItem('astrix_workspace_id', ws.id);
   };
 
   useEffect(() => {
@@ -66,7 +64,7 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     <WorkspaceContext.Provider value={{
       activeWorkspace,
       workspaces,
-      isLoadingWorkspace,
+      isWorkspaceInitializing,
       setActiveWorkspace: handleSetActiveWorkspace,
       refreshWorkspaces: fetchWorkspaces
     }}>
