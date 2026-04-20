@@ -87,11 +87,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, title, subtitle,
           </button>
         </div>
 
-        <div className="p-4 shrink-0 relative" ref={dropdownRef}>
-          <button 
-            onClick={() => setIsWorkspaceDropdownOpen(!isWorkspaceDropdownOpen)}
-            className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-sidebar-hover transition-colors border border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-astrix-teal"
-          >
+        <div className="p-4 shrink-0">
+          <div className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-sidebar-hover/50 border border-slate-700/50">
             <div className="flex items-center gap-3 overflow-hidden">
               <div className="w-8 h-8 rounded-md bg-slate-800 border border-slate-700 flex items-center justify-center text-white font-bold text-xs shadow-sm shrink-0">
                 {isWorkspaceInitializing ? '...' : wsInitials}
@@ -103,36 +100,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, title, subtitle,
                 <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Workspace</span>
               </div>
             </div>
-            <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${isWorkspaceDropdownOpen ? 'rotate-180' : ''}`} />
-          </button>
-
-          {isWorkspaceDropdownOpen && (
-            <div className="absolute top-full left-4 right-4 mt-1 bg-slate-800 border border-slate-700 rounded-xl shadow-xl overflow-hidden z-50 animate-[fadeIn_0.2s_ease-out]">
-              <div className="max-h-64 overflow-y-auto py-2 hide-scrollbar">
-                {workspaces.map(ws => (
-                  <button
-                    key={ws.id}
-                    onClick={() => {
-                      setActiveWorkspace(ws);
-                      setIsWorkspaceDropdownOpen(false);
-                      navigate('/app');
-                    }}
-                    className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-slate-700 transition-colors text-left"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-6 h-6 rounded bg-slate-900 flex items-center justify-center text-slate-300 font-bold text-[10px] shrink-0">
-                        {ws.name.substring(0, 2).toUpperCase()}
-                      </div>
-                      <span className={`text-sm font-medium truncate ${activeWorkspace?.id === ws.id ? 'text-astrix-teal font-bold' : 'text-slate-300'}`}>
-                        {ws.name}
-                      </span>
-                    </div>
-                    {activeWorkspace?.id === ws.id && <Check className="w-4 h-4 text-astrix-teal shrink-0 ml-2" />}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+          </div>
         </div>
 
         <nav className="flex-1 overflow-y-auto px-3 py-2 space-y-1 hide-scrollbar">

@@ -1,10 +1,26 @@
 import React from 'react';
 import { AppLayout } from '../../layouts/AppLayout';
-import { TrendingUp, ArrowRight, UploadCloud, Activity, Database, CheckCircle2, Layers, Clock, AlertCircle, Zap } from 'lucide-react';
+import { 
+  TrendingUp, 
+  ArrowRight, 
+  UploadCloud, 
+  Activity, 
+  Database, 
+  CheckCircle2, 
+  Layers, 
+  Clock, 
+  AlertCircle, 
+  Zap 
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { useAuth } from '../../contexts/AuthContext';
-import { useSignals, useOpportunities, useProblems, useDecisions, useLaunches } from '../../lib/api';
+import { 
+  useSignals, 
+  useOpportunities, 
+  useDecisions, 
+  useLaunches 
+} from '../../lib/api';
 import { Skeleton } from '../../components/ui/Skeleton';
 
 export const Dashboard = () => {
@@ -14,7 +30,6 @@ export const Dashboard = () => {
 
   const { data: oppData, isLoading: oppLoading } = useOpportunities(wsId);
   const { data: sigData } = useSignals(wsId);
-  const { data: probData } = useProblems(wsId);
   const { data: decData } = useDecisions(wsId);
   const { data: launchData } = useLaunches(wsId);
 
@@ -41,7 +56,6 @@ export const Dashboard = () => {
     return `$${value}`;
   };
 
-  // Mock calculation for unmatched signals (for UI realism)
   const unmatchedSignals = Math.max(0, Math.floor(signalsCount * 0.15));
 
   return (
@@ -69,78 +83,13 @@ export const Dashboard = () => {
         </div>
       )}
 
-      {/* 2. QUICK STATS: The Engine Overview */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-10">
-        
-        {/* Total Signals + Trend */}
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 md:p-6 relative overflow-hidden group hover:border-brand-blue/30 transition-colors">
-          <div className="flex justify-between items-start mb-2">
-            <div className="text-xs font-bold text-gray-500 uppercase tracking-widest">Total Signals</div>
-            <div className="flex items-center gap-1 text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-md">
-              <TrendingUp className="w-3 h-3" /> +12%
-            </div>
-          </div>
-          <div className="text-3xl font-heading font-black text-gray-900 mb-4">{signalsCount}</div>
-          
-          {/* Premium SVG Sparkline */}
-          <div className="absolute bottom-0 left-0 w-full h-12 opacity-40 group-hover:opacity-100 transition-opacity duration-500">
-            <svg viewBox="0 0 100 30" preserveAspectRatio="none" className="w-full h-full">
-              <defs>
-                <linearGradient id="trend-gradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#1A56FF" stopOpacity="0.2" />
-                  <stop offset="100%" stopColor="#1A56FF" stopOpacity="0" />
-                </linearGradient>
-              </defs>
-              <path d="M0,30 L10,25 L20,28 L30,20 L40,22 L50,15 L60,18 L70,10 L80,12 L90,5 L100,0 L100,30 L0,30 Z" fill="url(#trend-gradient)" />
-              <path d="M0,30 L10,25 L20,28 L30,20 L40,22 L50,15 L60,18 L70,10 L80,12 L90,5 L100,0" fill="none" stroke="#1A56FF" strokeWidth="2" vectorEffect="non-scaling-stroke" />
-            </svg>
-          </div>
-        </div>
-
-        {/* Unmatched Signals (Needs Triage) */}
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 md:p-6 hover:border-gray-300 transition-colors">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="p-2 bg-gray-50 rounded-lg border border-gray-100"><AlertCircle className="w-4 h-4 text-gray-500" /></div>
-            <div className="text-xs font-bold text-gray-500 uppercase tracking-widest">Needs Triage</div>
-          </div>
-          <div className="flex items-end gap-3">
-            <div className="text-3xl font-heading font-black text-gray-900">{unmatchedSignals}</div>
-            <div className="text-sm font-medium text-gray-500 mb-1">unclustered signals</div>
-          </div>
-        </div>
-
-        {/* Top Opportunity Score */}
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 md:p-6 hover:border-astrix-teal/30 transition-colors">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="p-2 bg-teal-50 rounded-lg border border-teal-100"><Zap className="w-4 h-4 text-astrix-teal" /></div>
-            <div className="text-xs font-bold text-gray-500 uppercase tracking-widest">Top Opp Score</div>
-          </div>
-          <div className="flex items-end gap-3">
-            <div className="text-3xl font-heading font-black text-astrix-teal">{opportunities[0]?.opportunity_score || 0}</div>
-            <div className="text-sm font-medium text-gray-500 mb-1">/ 100</div>
-          </div>
-        </div>
-
-        {/* Decisions Made */}
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 md:p-6 hover:border-gray-300 transition-colors">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="p-2 bg-blue-50 rounded-lg border border-blue-100"><CheckCircle2 className="w-4 h-4 text-brand-blue" /></div>
-            <div className="text-xs font-bold text-gray-500 uppercase tracking-widest">Decisions Logged</div>
-          </div>
-          <div className="flex items-end gap-3">
-            <div className="text-3xl font-heading font-black text-gray-900">{decisions.length}</div>
-            <div className="text-sm font-medium text-gray-500 mb-1">this quarter</div>
-          </div>
-        </div>
-      </div>
-
-      {/* 3. MAIN CONTENT: Opportunities & Execution */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-24">
+      {/* 2. MAIN CONTENT: Opportunities & Execution */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-12">
         
         {/* Left: Top Opportunities */}
         <div className="xl:col-span-2 flex flex-col">
           <div className="flex items-center justify-between mb-5">
-            <h2 className="font-heading text-xl font-bold text-gray-900">Ranked Opportunities</h2>
+            <h2 className="font-heading text-xl font-bold text-gray-900">Top Opportunities</h2>
             <Link to="/app/opportunities" className="text-sm font-bold text-astrix-teal hover:underline flex items-center gap-1">
               View all <ArrowRight className="w-4 h-4" />
             </Link>
@@ -161,7 +110,7 @@ export const Dashboard = () => {
               </div>
             ) : (
               <div className="divide-y divide-gray-100">
-                {topOpportunities.map((opp, i) => (
+                {topOpportunities.map((opp) => (
                   <Link 
                     key={opp.id} 
                     to={`/app/opportunities/${opp.id}`}
@@ -204,12 +153,13 @@ export const Dashboard = () => {
         </div>
 
         {/* Right: Execution Tracking */}
-        <div className="xl:col-span-1 flex flex-col gap-8">
+        <div className="xl:col-span-1 flex flex-col gap-6">
           
           {/* Active Launches */}
           <div className="flex flex-col flex-1">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="font-heading text-xl font-bold text-gray-900">Active Launches</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-heading text-lg font-bold text-gray-900">Active Launches</h2>
+              <Link to="/app/launches" className="text-xs font-bold text-gray-400 hover:text-gray-900 transition-colors uppercase tracking-widest">See all</Link>
             </div>
             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 flex-1 flex flex-col">
               {activeLaunches.length === 0 ? (
@@ -217,26 +167,21 @@ export const Dashboard = () => {
                   <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mb-3">
                     <Activity className="w-5 h-5 text-gray-400" />
                   </div>
-                  <p className="text-sm text-gray-500 font-medium">No active launches tracking.</p>
+                  <p className="text-sm text-gray-500 font-medium">No active launches.</p>
                 </div>
               ) : (
                 <div className="space-y-4">
                   {activeLaunches.slice(0, 3).map(launch => (
-                    <Link key={launch.id} to={`/app/launches/${launch.id}`} className="block group">
+                    <Link key={launch.id} to={`/app/launches/${launch.id}`} className="block group border-b border-gray-50 last:border-0 pb-3 last:pb-0">
                       <div className="flex items-start justify-between gap-3 mb-1.5">
                         <div className="text-sm font-bold text-gray-900 line-clamp-1 group-hover:text-brand-blue transition-colors">{launch.title}</div>
-                        <span className="text-[10px] font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded uppercase shrink-0">Tracking</span>
+                        <span className="text-[10px] font-mono font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded uppercase shrink-0">Tracking</span>
                       </div>
-                      <div className="flex items-center gap-2 text-xs text-gray-500 font-medium">
+                      <div className="flex items-center gap-2 text-xs text-gray-400 font-medium">
                         <Clock className="w-3 h-3" /> {new Date(launch.launched_at).toLocaleDateString()}
                       </div>
                     </Link>
                   ))}
-                  {activeLaunches.length > 3 && (
-                    <Link to="/app/launches" className="block text-center text-xs font-bold text-gray-500 hover:text-gray-900 pt-2 mt-2 border-t border-gray-100">
-                      View all {activeLaunches.length} launches
-                    </Link>
-                  )}
                 </div>
               )}
             </div>
@@ -244,8 +189,9 @@ export const Dashboard = () => {
 
           {/* Recent Decisions */}
           <div className="flex flex-col flex-1">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="font-heading text-xl font-bold text-gray-900">Recent Decisions</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-heading text-lg font-bold text-gray-900">Recent Decisions</h2>
+              <Link to="/app/decisions" className="text-xs font-bold text-gray-400 hover:text-gray-900 transition-colors uppercase tracking-widest">History</Link>
             </div>
             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 flex-1 flex flex-col">
               {recentDecisions.length === 0 ? (
@@ -253,17 +199,17 @@ export const Dashboard = () => {
                   <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mb-3">
                     <CheckCircle2 className="w-5 h-5 text-gray-400" />
                   </div>
-                  <p className="text-sm text-gray-500 font-medium">No decisions logged yet.</p>
+                  <p className="text-sm text-gray-500 font-medium">No decisions logged.</p>
                 </div>
               ) : (
                 <div className="space-y-4">
                   {recentDecisions.map(dec => (
-                    <Link key={dec.id} to={`/app/decisions/${dec.id}`} className="block group">
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${dec.action === 'Build' ? 'bg-blue-50 text-blue-700 border border-blue-100' : dec.action === 'Fix' ? 'bg-yellow-50 text-yellow-700 border border-yellow-100' : 'bg-gray-100 text-gray-600 border border-gray-200'}`}>
+                    <Link key={dec.id} to={`/app/decisions/${dec.id}`} className="block group border-b border-gray-50 last:border-0 pb-3 last:pb-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${dec.action === 'Build' ? 'bg-blue-50 text-blue-700 border border-blue-100' : dec.action === 'Fix' ? 'bg-yellow-50 text-yellow-700 border border-yellow-100' : 'bg-gray-100 text-gray-600 border border-gray-200'}`}>
                           {dec.action}
                         </span>
-                        <span className="text-[10px] text-gray-400 font-mono">{new Date(dec.created_at).toLocaleDateString()}</span>
+                        <span className="text-[10px] text-gray-400 font-mono italic">{new Date(dec.created_at).toLocaleDateString()}</span>
                       </div>
                       <div className="text-sm font-bold text-gray-900 line-clamp-1 group-hover:text-brand-blue transition-colors">{dec.title}</div>
                     </Link>
@@ -273,6 +219,71 @@ export const Dashboard = () => {
             </div>
           </div>
 
+        </div>
+      </div>
+
+      {/* 3. PERFORMANCE STATS: Bottom context */}
+      <h2 className="font-heading text-lg font-bold text-gray-900 mb-5">Workspace Pulse</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-12">
+        
+        {/* Total Signals + Trend */}
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 md:p-6 relative overflow-hidden group hover:border-brand-blue/30 transition-colors">
+          <div className="flex justify-between items-start mb-2">
+            <div className="text-xs font-bold text-gray-500 uppercase tracking-widest">Total Signals</div>
+            <div className="flex items-center gap-1 text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-md">
+              <TrendingUp className="w-3 h-3" /> +12%
+            </div>
+          </div>
+          <div className="text-3xl font-heading font-black text-gray-900 mb-4">{signalsCount}</div>
+          
+          <div className="absolute bottom-0 left-0 w-full h-12 opacity-40 group-hover:opacity-100 transition-opacity duration-500">
+            <svg viewBox="0 0 100 30" preserveAspectRatio="none" className="w-full h-full">
+              <defs>
+                <linearGradient id="trend-gradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#1A56FF" stopOpacity="0.2" />
+                  <stop offset="100%" stopColor="#1A56FF" stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              <path d="M0,30 L10,25 L20,28 L30,20 L40,22 L50,15 L60,18 L70,10 L80,12 L90,5 L100,0 L100,30 L0,30 Z" fill="url(#trend-gradient)" />
+              <path d="M0,30 L10,25 L20,28 L30,20 L40,22 L50,15 L60,18 L70,10 L80,12 L90,5 L100,0" fill="none" stroke="#1A56FF" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+            </svg>
+          </div>
+        </div>
+
+        {/* Unmatched Signals (Needs Triage) */}
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 md:p-6 hover:border-gray-300 transition-colors">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 bg-gray-50 rounded-lg border border-gray-100"><AlertCircle className="w-4 h-4 text-gray-500" /></div>
+            <div className="text-xs font-bold text-gray-500 uppercase tracking-widest">Unmatched Signals</div>
+          </div>
+          <div className="flex items-end gap-3">
+            <div className="text-2xl font-heading font-black text-gray-900">{unmatchedSignals}</div>
+            <div className="text-sm font-medium text-gray-500 mb-1">needs triage</div>
+          </div>
+        </div>
+
+        {/* Top Opportunity Score */}
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 md:p-6 hover:border-astrix-teal/30 transition-colors">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 bg-teal-50 rounded-lg border border-teal-100"><Zap className="w-4 h-4 text-astrix-teal" /></div>
+            <div className="text-xs font-bold text-gray-500 uppercase tracking-widest">Max Opp Score</div>
+          </div>
+          <div className="flex items-end gap-3">
+            <div className="text-2xl font-heading font-black text-astrix-teal">{opportunities[0]?.opportunity_score || 0}</div>
+            <div className="text-sm font-medium text-gray-500 mb-1">priority index</div>
+          </div>
+        </div>
+
+        {/* Decisions Made */}
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 md:p-6 hover:border-gray-300 transition-colors">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="p-2 bg-blue-50 rounded-lg border border-blue-100"><CheckCircle2 className="w-4 h-4 text-brand-blue" /></div>
+            <div className="text-xs font-bold text-gray-500 uppercase tracking-widest">Decision Alpha</div>
+          </div>
+          <div className="flex items-end gap-3">
+            <div className="text-2xl font-heading font-black text-gray-900">84%</div>
+            <div className="text-sm font-medium text-gray-500 mb-1">proof accuracy</div>
+          </div>
         </div>
       </div>
 

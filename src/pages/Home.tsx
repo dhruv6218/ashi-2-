@@ -4,7 +4,6 @@ import { HeroSection } from '../components/sections/HeroSection';
 import { ChaosSection } from '../components/sections/ChaosSection';
 import { ClaritySection } from '../components/sections/ClaritySection';
 import { VolumeValueSection } from '../components/sections/VolumeValueSection';
-import { IngestionSection } from '../components/sections/IngestionSection';
 import { SignalExplorerSection } from '../components/sections/SignalExplorerSection';
 import { EvidenceViewSection } from '../components/sections/EvidenceViewSection';
 import { EngineSection } from '../components/sections/EngineSection';
@@ -45,7 +44,6 @@ export const Home = () => {
       <VolumeValueSection />
       
       {/* 5. Product Preview: The Core Loop in Action */}
-      <IngestionSection />
       <SignalExplorerSection />
       <EvidenceViewSection />
       <EngineSection />

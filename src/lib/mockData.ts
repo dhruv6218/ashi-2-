@@ -48,7 +48,22 @@ export const MOCK_ARTIFACTS = [
 ];
 
 export const MOCK_LAUNCHES = [
-  { id: 'launch-1', workspace_id: 'ws-1', decision_id: 'dec-1', title: 'SAML SSO Integration Missing', action: 'Build', jira_url: 'https://jira.com/AST-123', launched_at: new Date(Date.now() - 7 * 86400000).toISOString(), created_by: 'user-1', created_at: new Date().toISOString(), status: 'active' as const }
+  { 
+    id: 'launch-1', 
+    workspace_id: 'ws-1', 
+    decision_id: 'dec-1', 
+    title: 'Enterprise SAML SSO', 
+    action: 'Build', 
+    launched_at: new Date(Date.now() - 14 * 86400000).toISOString(), 
+    created_by: 'user-1', 
+    created_at: new Date().toISOString(), 
+    status: 'active' as const,
+    expected_outcome: 'Reduce security-related churn by 30% and unblock Enterprise renewals.',
+    before_count: 84,
+    after_count: 12,
+    pm_verdict: 'Solved',
+    notes: 'Okta and Azure AD support successfully addressed the primary friction point. Large renewals are processing normally.'
+  }
 ];
 
 export const MOCK_MEMBERS = [

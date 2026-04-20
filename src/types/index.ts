@@ -97,7 +97,6 @@ export interface Launch {
   id: string;
   workspace_id: string;
   decision_id: string;
-  jira_url: string | null;
   launched_at: string;
   created_by: string;
   created_at: string;
