@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useMousePosition } from './hooks/useMousePosition';
 import { AuthProvider } from './contexts/AuthContext';
 import { WorkspaceProvider } from './contexts/WorkspaceContext';
@@ -10,11 +10,13 @@ import { KeyboardShortcuts } from './components/ui/KeyboardShortcuts';
 // Public Pages
 import { Home } from './pages/Home';
 import { Pricing } from './pages/Pricing';
+import { Contact } from './pages/Contact';
 import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
 import { ForgotPassword } from './pages/ForgotPassword';
 import { ResetPassword } from './pages/ResetPassword';
 import { NotFound } from './pages/NotFound';
+import { AcceptInvitation } from './pages/AcceptInvitation';
 
 // Marketing & Legal Pages
 import { PrivacyPolicy } from './pages/legal/PrivacyPolicy';
@@ -42,7 +44,6 @@ import { LaunchDetail } from './pages/app/LaunchDetail';
 import { Settings } from './pages/app/Settings';
 import { AccountDetail } from './pages/app/AccountDetail';
 import { ArtifactDetail } from './pages/app/ArtifactDetail';
-import { Navigate } from 'react-router-dom';
 
 function App() {
   useMousePosition();
@@ -62,6 +63,7 @@ function App() {
               <Route path="/signup" element={<Signup />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/accept-invitation" element={<AcceptInvitation />} />
               
               {/* Marketing & Legal */}
               <Route path="/privacy" element={<PrivacyPolicy />} />
@@ -79,6 +81,7 @@ function App() {
               <Route path="/app/dashboard" element={<Navigate to="/app" replace />} />
               <Route path="/app/signals" element={<ProtectedRoute><SignalExplorer /></ProtectedRoute>} />
               <Route path="/app/signals/new" element={<ProtectedRoute><SignalExplorer defaultOpenAdd /></ProtectedRoute>} />
+              <Route path="/app/signals/:id" element={<ProtectedRoute><SignalExplorer /></ProtectedRoute>} />
               <Route path="/app/accounts" element={<ProtectedRoute><AccountsList /></ProtectedRoute>} />
               <Route path="/app/accounts/:id" element={<ProtectedRoute><AccountDetail /></ProtectedRoute>} />
               

@@ -1,3 +1,4 @@
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 import { MOCK_WORKSPACE } from '../lib/mockData';
 import { Workspace } from '../types';

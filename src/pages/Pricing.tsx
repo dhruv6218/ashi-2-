@@ -7,7 +7,6 @@ import { useToast } from '../contexts/ToastContext';
 import { useNavigate } from 'react-router-dom';
 
 export const Pricing = () => {
-  const [isAnnual, setIsAnnual] = useState(true);
   const { ref: headerRef, isVisible: headerVisible } = useScrollReveal();
   const { ref: cardsRef, isVisible: cardsVisible } = useScrollReveal(0.1);
 
@@ -63,7 +62,6 @@ export const Pricing = () => {
         "CSV upload & manual entry",
         "2,500 AI classifications & 100 memos",
         "Launch reviews & verdicts",
-        "Ask Assistant (beta)",
         "Priority support"
       ],
       cta: "Talk to Founder",
@@ -110,21 +108,6 @@ export const Pricing = () => {
           <p className={`text-lg md:text-xl text-gray-600 font-medium max-w-2xl mx-auto mb-12 transition-all duration-700 delay-100 ${headerVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
             The accountability loop for every stage of growth.
           </p>
-
-          {/* Toggle */}
-          <div className={`flex items-center justify-center gap-4 transition-all duration-700 delay-200 ${headerVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-            <span className={`text-sm font-bold transition-colors ${!isAnnual ? 'text-gray-900' : 'text-gray-500'}`}>Monthly</span>
-            <button 
-              onClick={() => setIsAnnual(!isAnnual)}
-              className="w-14 h-8 bg-gray-200 rounded-full relative focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-blue/30 transition-colors"
-              aria-label="Toggle billing period"
-            >
-              <div className={`absolute top-1 w-6 h-6 bg-white rounded-full shadow-sm transition-all duration-300 cubic-bezier(0.16,1,0.3,1) ${isAnnual ? 'left-7 bg-brand-blue' : 'left-1'}`}></div>
-            </button>
-            <span className={`text-sm font-bold flex items-center gap-2 transition-colors ${isAnnual ? 'text-gray-900' : 'text-gray-500'}`}>
-              Annual <span className="bg-green-100 text-green-700 text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">Save ~16%</span>
-            </span>
-          </div>
         </div>
       </div>
 

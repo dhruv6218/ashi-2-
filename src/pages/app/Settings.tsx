@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { AppLayout } from '../../layouts/AppLayout';
-import { Building2, Users, CreditCard, Loader2, Trash2, Plus, X, Copy, Box, Target } from 'lucide-react';
+import { Building2, Users, CreditCard, Loader2, Trash2, Plus, X, Box, Target } from 'lucide-react';
 import { useToast } from '../../contexts/ToastContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useTeam, api } from '../../lib/api';
 
 export const Settings = () => {
@@ -15,7 +15,6 @@ export const Settings = () => {
   // Data States
   const { data: teamData, isLoading: teamLoading, refetch: refetchTeam } = useTeam(activeWorkspace?.id);
   const members = teamData?.members || [];
-  const invites = teamData?.invites || [];
 
   const [wsName, setWsName] = useState('');
   const [wsTimezone, setWsTimezone] = useState('');
@@ -37,7 +36,6 @@ export const Settings = () => {
 
   const fetchSubscription = async () => {
     if (!activeWorkspace) return;
-    // Ready for real Supabase/backend call
     setSubscription(null);
   };
 
@@ -69,17 +67,6 @@ export const Settings = () => {
     } finally {
       setIsSendingInvite(false);
     }
-  };
-
-  const copyInviteLink = (token: string) => {
-    const link = `${window.location.origin}/accept-invitation?token=${token}`;
-    navigator.clipboard.writeText(link);
-    addToast("Invite link copied to clipboard", "success");
-  };
-
-  const handleJiraToggle = () => {
-    setIsJiraConnected(!isJiraConnected);
-    addToast(isJiraConnected ? "Jira disconnected" : "Jira connected successfully", "success");
   };
 
   const removeMember = async (id: string) => {

@@ -4,6 +4,7 @@ import { AppLayout } from '../../layouts/AppLayout';
 import { useArtifact, api } from '../../lib/api';
 import { FileText, ArrowLeft, Copy, Edit2, Check, Clock, User, Share2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { useToast } from '../../contexts/ToastContext';
 
 export const ArtifactDetail = () => {
@@ -95,7 +96,7 @@ export const ArtifactDetail = () => {
               />
             ) : (
               <div className="p-8 md:p-12 prose prose-stone max-w-none">
-                <ReactMarkdown>{artifact.content}</ReactMarkdown>
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{artifact.content}</ReactMarkdown>
               </div>
             )}
           </div>

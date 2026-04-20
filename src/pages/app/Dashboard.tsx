@@ -6,7 +6,6 @@ import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSignals, useOpportunities, useProblems, useDecisions, useLaunches } from '../../lib/api';
 import { Skeleton } from '../../components/ui/Skeleton';
-import { AIBadge } from '../../components/ui/AIBadge';
 
 export const Dashboard = () => {
   const { activeWorkspace } = useWorkspace();
@@ -23,7 +22,6 @@ export const Dashboard = () => {
 
   const opportunities = oppData || [];
   const signalsCount = sigData?.total || 0;
-  const problemsCount = probData?.length || 0;
   const decisions = decData || [];
   const launches = launchData || [];
 

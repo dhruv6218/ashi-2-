@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, Search, Layers, TrendingUp, CheckCircle, 
-  Settings, LogOut, Bell, Menu, X, ChevronDown, Check, Plus,
+  Settings, LogOut, Bell, Menu, X, ChevronDown, Check,
   FileText, Rocket, Building2
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -17,11 +17,11 @@ interface AppLayoutProps {
   backPath?: string;
 }
 
-export const AppLayout: React.FC<AppLayoutProps> = ({ children, title, subtitle, actions }) => {
+export const AppLayout: React.FC<AppLayoutProps> = ({ children, title, subtitle, actions, backPath }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
-  const { workspaces, activeWorkspace, isLoadingWorkspace, setActiveWorkspace } = useWorkspace();
+  const { workspaces, activeWorkspace, isWorkspaceInitializing, setActiveWorkspace } = useWorkspace();
   
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isWorkspaceDropdownOpen, setIsWorkspaceDropdownOpen] = useState(false);
@@ -94,11 +94,11 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, title, subtitle,
           >
             <div className="flex items-center gap-3 overflow-hidden">
               <div className="w-8 h-8 rounded-md bg-slate-800 border border-slate-700 flex items-center justify-center text-white font-bold text-xs shadow-sm shrink-0">
-                {isLoadingWorkspace ? '...' : wsInitials}
+                {isWorkspaceInitializing ? '...' : wsInitials}
               </div>
               <div className="flex flex-col items-start overflow-hidden">
                 <span className="text-sm font-bold text-white leading-tight truncate w-full text-left">
-                  {isLoadingWorkspace ? 'Loading...' : wsName}
+                  {isWorkspaceInitializing ? 'Loading...' : wsName}
                 </span>
                 <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Workspace</span>
               </div>

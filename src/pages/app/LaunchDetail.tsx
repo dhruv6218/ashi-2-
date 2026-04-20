@@ -142,15 +142,20 @@ export const LaunchDetail = () => {
 
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2 whitespace-nowrap">
-                   PM Verdict (Day 7 Review) <span className="text-red-500">*</span>
+                   Final Verdict <span className="text-red-500">*</span>
                 </label>
-                <textarea 
+                <select 
                   required
                   value={formData.pm_verdict} 
                   onChange={e => setFormData({ ...formData, pm_verdict: e.target.value })} 
-                  placeholder="Record your initial verdict on if this launch solved the problem..."
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-astrix-teal min-h-[100px] resize-none font-medium" 
-                />
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-sm outline-none focus:ring-2 focus:ring-astrix-teal font-medium" 
+                >
+                  <option value="" disabled>Select a verdict...</option>
+                  <option value="Solved">Solved</option>
+                  <option value="Partially Solved">Partially Solved</option>
+                  <option value="Not Solved">Not Solved</option>
+                  <option value="Regressed">Regressed</option>
+                </select>
                 <p className="text-[10px] text-gray-400 mt-2 font-medium italic">Self-accountability: This verdict will be permanently linked to this decision artifact.</p>
               </div>
 
@@ -166,7 +171,7 @@ export const LaunchDetail = () => {
               <div className="flex justify-end pt-4 border-t border-gray-100">
                 <button 
                   onClick={handleSaveOutcome} 
-                  disabled={isSaving} 
+                  disabled={isSaving || !formData.pm_verdict} 
                   className="bg-astrix-teal text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-astrix-darkTeal disabled:opacity-50 transition-colors flex items-center gap-2"
                 >
                   {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}

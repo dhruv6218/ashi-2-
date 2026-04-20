@@ -47,7 +47,7 @@ Enterprise accounts are churning due to lack of SAML SSO.
         <div className={`relative z-10 bg-white shadow-xl shadow-gray-200/50 border border-gray-200 rounded-2xl p-6 md:p-8 h-[400px] md:h-[450px] flex flex-col transition-all duration-700 ${isVisible ? 'translate-x-0 opacity-100' : '-translate-x-10 opacity-0'}`}>
           <div className="flex items-center gap-3 border-b border-gray-100 pb-4 mb-6">
             <FileText className="w-5 h-5 text-brand-blue" />
-            <span className="font-mono text-xs md:text-sm text-gray-500 font-bold">Artifact Studio / Groq Llama 4</span>
+            <span className="font-mono text-xs md:text-sm text-gray-500 font-bold">Artifact Studio / AI Generation</span>
           </div>
           <div className="font-mono text-xs md:text-sm text-gray-700 whitespace-pre-wrap flex-1 overflow-hidden font-medium leading-relaxed">
             {text}
@@ -58,7 +58,7 @@ Enterprise accounts are churning due to lack of SAML SSO.
             <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center animate-[fadeIn_0.3s_ease-out]">
               <span className="text-xs text-green-600 font-mono font-bold">✓ Generated successfully</span>
               <button className="bg-brand-blue text-white px-4 md:px-5 py-2 md:py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 shadow-sm hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-brand-blue focus:ring-offset-2 outline-none">
-                Push to Jira <ArrowRight className="w-4 h-4" />
+                Save to Workspace <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           )}
@@ -74,7 +74,7 @@ Enterprise accounts are churning due to lack of SAML SSO.
             <span className="text-gray-300 text-stroke">Execution Ready.</span>
           </h2>
           <p className="text-lg md:text-xl text-gray-600 font-medium mb-8">
-            Stop writing boilerplate. Once a decision is made, Groq AI instantly generates your Decision Memo, PRD, and Jira Epics—complete with evidence citations.
+            Stop writing boilerplate. Once a decision is made, AI instantly generates your Decision Memo and PRD—complete with evidence citations.
           </p>
         </div>
 

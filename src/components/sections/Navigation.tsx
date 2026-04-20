@@ -53,7 +53,6 @@ export const Navigation = () => {
   };
 
   const navLinks = [
-    { name: 'Features', path: '/#features' },
     { name: 'Pricing', path: '/pricing' },
     { name: 'Contact', path: '/contact' }
   ];
