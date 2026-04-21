@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthContext';
-import { MOCK_WORKSPACE } from '../lib/mockData';
+import { supabase } from '../lib/supabase';
 import { Workspace } from '../types';
 
 interface WorkspaceContextType {
@@ -22,40 +22,81 @@ const WorkspaceContext = createContext<WorkspaceContextType>({
 export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
-  const [activeWorkspace, setActiveWorkspace] = useState<Workspace | null>(null);
+  const [activeWorkspace, setActiveWorkspaceState] = useState<Workspace | null>(null);
   const [isWorkspaceInitializing, setIsWorkspaceInitializing] = useState(true);
 
-  const fetchWorkspaces = async () => {
+  const fetchWorkspaces = useCallback(async () => {
     if (!user) {
       setWorkspaces([]);
-      setActiveWorkspace(null);
+      setActiveWorkspaceState(null);
       setIsWorkspaceInitializing(false);
       return;
     }
 
     setIsWorkspaceInitializing(true);
-    
-    // Simulate Supabase async fetch
-    await new Promise(resolve => setTimeout(resolve, 600));
-    
-    const fetchedWorkspaces = [{
-      ...MOCK_WORKSPACE,
-      product_areas: ['Authentication', 'Core UI', 'API', 'Billing'],
-      segments: ['Enterprise', 'SMB', 'Growth']
-    }];
-    setWorkspaces(fetchedWorkspaces);
-    setActiveWorkspace(fetchedWorkspaces[0]);
 
-    setIsWorkspaceInitializing(false);
-  };
+    try {
+      // Fetch workspaces where the user is a member, via workspace_members join
+      const { data, error } = await supabase
+        .from('workspace_members')
+        .select(`
+          role,
+          workspaces:workspace_id (
+            id, name, slug, timezone, logo_url, owner_id, onboarding_done, created_at, updated_at
+          )
+        `)
+        .eq('user_id', user.id)
+        .order('joined_at', { ascending: true });
+
+      if (error) {
+        console.error('WorkspaceContext fetch error:', error);
+        setWorkspaces([]);
+        setActiveWorkspaceState(null);
+        return;
+      }
+
+      // Flatten the join result
+      const fetchedWorkspaces: Workspace[] = (data ?? [])
+        .map((row: any) => row.workspaces)
+        .filter(Boolean);
+
+      // Fetch product_areas and segments for each workspace
+      const enriched = await Promise.all(
+        fetchedWorkspaces.map(async (ws) => {
+          const [{ data: areas }, { data: segs }] = await Promise.all([
+            supabase.from('product_areas').select('name').eq('workspace_id', ws.id),
+            supabase.from('segments').select('name').eq('workspace_id', ws.id),
+          ]);
+          return {
+            ...ws,
+            product_areas: (areas ?? []).map((a: any) => a.name),
+            segments: (segs ?? []).map((s: any) => s.name),
+          };
+        }),
+      );
+
+      setWorkspaces(enriched);
+
+      // Keep current active workspace, or default to first
+      setActiveWorkspaceState(prev => {
+        if (prev) {
+          const updated = enriched.find(w => w.id === prev.id);
+          return updated ?? (enriched[0] ?? null);
+        }
+        return enriched[0] ?? null;
+      });
+    } finally {
+      setIsWorkspaceInitializing(false);
+    }
+  }, [user]);
 
   const handleSetActiveWorkspace = (ws: Workspace) => {
-    setActiveWorkspace(ws);
+    setActiveWorkspaceState(ws);
   };
 
   useEffect(() => {
     fetchWorkspaces();
-  }, [user]);
+  }, [fetchWorkspaces]);
 
   return (
     <WorkspaceContext.Provider value={{
@@ -63,7 +104,7 @@ export const WorkspaceProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       workspaces,
       isWorkspaceInitializing,
       setActiveWorkspace: handleSetActiveWorkspace,
-      refreshWorkspaces: fetchWorkspaces
+      refreshWorkspaces: fetchWorkspaces,
     }}>
       {children}
     </WorkspaceContext.Provider>
