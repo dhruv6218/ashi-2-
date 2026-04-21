@@ -28,23 +28,23 @@ export const HeroSection = () => {
           <h1 className="font-heading text-4xl sm:text-6xl md:text-7xl lg:text-[5.5rem] leading-[1.1] sm:leading-none tracking-tighter font-black text-gray-900 m-0 p-0 relative z-20 w-full">
             <span className="block overflow-hidden pb-1 sm:pb-2">
               <span className={`block transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${isVisible ? 'translate-y-0' : 'translate-y-[120%]'}`}>
-                Turn customer signals
+                Know what to
               </span>
             </span>
             <span className="block overflow-hidden pb-2 sm:pb-4">
               <span className={`block text-brand-blue transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] delay-75 ${isVisible ? 'translate-y-0' : 'translate-y-[120%]'}`}>
-                into product decisions —
+                build next —
               </span>
             </span>
             <span className="block overflow-hidden pb-2 sm:pb-4">
               <span className={`block text-gray-900 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] delay-150 ${isVisible ? 'translate-y-0' : 'translate-y-[120%]'}`}>
-                and prove they worked.
+                and prove it worked.
               </span>
             </span>
           </h1>
           
           <p className={`mt-6 md:mt-8 text-lg md:text-xl lg:text-2xl text-gray-500 font-medium max-w-3xl px-4 sm:px-0 transition-all duration-700 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            The accountability layer for product teams. Turn scattered customer feedback into evidence-backed decisions, then verify whether what you shipped actually solved the problem.
+            ASTRIX AI is your ‘Cursor for product decisions’: a calm workspace that connects signals, problems, opportunities, decisions, launches, and final verdicts.
           </p>
         </div>
 

@@ -83,7 +83,9 @@ export const AccountDetail = () => {
                   </div>
                   <div>
                     <div className="text-xs text-gray-500 font-bold uppercase">Renewal Date</div>
-                    <div className="text-lg font-black text-gray-900">Oct 24, 2026</div> {/* Hardcoded for MVP truth */}
+                    <div className="text-lg font-black text-gray-900">
+                      {account.renewal_date ? new Date(account.renewal_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Not set'}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -93,7 +95,7 @@ export const AccountDetail = () => {
           <div className="bg-gray-900 text-white rounded-2xl p-6 shadow-xl">
             <h3 className="text-xs font-mono font-bold text-gray-500 uppercase tracking-widest mb-4">Account Segment</h3>
             <div className="text-xl font-bold mb-2">{account.plan || 'Standard'}</div>
-            <p className="text-sm text-gray-400">High priority account. Part of the 'Enterprise' customer segment defined in space settings.</p>
+            <p className="text-sm text-gray-400">High priority account. Part of the '{account.plan || 'Standard'}' customer segment defined in space settings.</p>
           </div>
         </div>
 

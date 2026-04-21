@@ -3,11 +3,12 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, Search, Layers, TrendingUp, CheckCircle, 
   Settings, LogOut, Bell, Menu, X, ChevronDown, Check,
-  FileText, Rocket, Building2
+  FileText, Rocket, Building2, Bot, Plus, Lock, Sparkles
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import { CsvUploadModal } from '../components/modals/CsvUploadModal';
+import { useToast } from '../contexts/ToastContext';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -22,6 +23,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, title, subtitle,
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { workspaces, activeWorkspace, isWorkspaceInitializing, setActiveWorkspace } = useWorkspace();
+  const { addToast } = useToast();
   
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isWorkspaceDropdownOpen, setIsWorkspaceDropdownOpen] = useState(false);
@@ -47,7 +49,14 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, title, subtitle,
     navigate('/login');
   };
 
-  // Strictly MVP Core Loop Navigation
+  const handleCreateWorkspaceClick = () => {
+    setIsWorkspaceDropdownOpen(false);
+    // Mocking the Scale plan restriction
+    addToast("Creating multiple workspaces requires the Scale plan.", "warning");
+    navigate('/pricing');
+  };
+
+  // MVP Core Loop Navigation + Assistant
   const navItems = [
     { name: 'Dashboard', path: '/app', icon: LayoutDashboard },
     { name: 'Signals', path: '/app/signals', icon: Search },
@@ -57,6 +66,7 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, title, subtitle,
     { name: 'Decisions', path: '/app/decisions', icon: CheckCircle },
     { name: 'Artifacts', path: '/app/artifacts', icon: FileText },
     { name: 'Launches', path: '/app/launches', icon: Rocket },
+    { name: 'Assistant', path: '/app/assistant', icon: Bot, pro: true },
     { name: 'Settings', path: '/app/settings', icon: Settings },
   ];
 
@@ -87,8 +97,11 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, title, subtitle,
           </button>
         </div>
 
-        <div className="p-4 shrink-0">
-          <div className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-sidebar-hover/50 border border-slate-700/50">
+        <div className="p-4 shrink-0 relative" ref={dropdownRef}>
+          <button 
+            onClick={() => setIsWorkspaceDropdownOpen(!isWorkspaceDropdownOpen)}
+            className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-sidebar-hover/50 border border-slate-700/50 hover:bg-sidebar-hover transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-astrix-teal"
+          >
             <div className="flex items-center gap-3 overflow-hidden">
               <div className="w-8 h-8 rounded-md bg-slate-800 border border-slate-700 flex items-center justify-center text-white font-bold text-xs shadow-sm shrink-0">
                 {isWorkspaceInitializing ? '...' : wsInitials}
@@ -97,10 +110,41 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, title, subtitle,
                 <span className="text-sm font-bold text-white leading-tight truncate w-full text-left">
                   {isWorkspaceInitializing ? 'Loading...' : wsName}
                 </span>
-                <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Workspace</span>
+                <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Free Plan</span>
               </div>
             </div>
-          </div>
+            <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${isWorkspaceDropdownOpen ? 'rotate-180' : ''}`} />
+          </button>
+
+          {/* Workspace Dropdown */}
+          {isWorkspaceDropdownOpen && (
+            <div className="absolute top-full left-4 right-4 mt-2 bg-slate-800 border border-slate-700 rounded-xl shadow-xl z-50 overflow-hidden animate-[fadeIn_0.15s_ease-out]">
+              <div className="p-2 space-y-1">
+                <div className="text-[10px] font-mono text-slate-400 uppercase tracking-widest px-2 py-1">Your Workspaces</div>
+                {workspaces.map(ws => (
+                  <button 
+                    key={ws.id}
+                    onClick={() => { setActiveWorkspace(ws); setIsWorkspaceDropdownOpen(false); }}
+                    className="w-full flex items-center justify-between px-2 py-2 rounded-lg hover:bg-slate-700 transition-colors text-left"
+                  >
+                    <span className="text-sm font-bold text-white truncate">{ws.name}</span>
+                    {activeWorkspace?.id === ws.id && <Check className="w-4 h-4 text-astrix-teal" />}
+                  </button>
+                ))}
+              </div>
+              <div className="border-t border-slate-700 p-2">
+                <button 
+                  onClick={handleCreateWorkspaceClick}
+                  className="w-full flex items-center justify-between px-2 py-2 rounded-lg hover:bg-slate-700 transition-colors text-left group"
+                >
+                  <span className="flex items-center gap-2 text-sm font-bold text-slate-300 group-hover:text-white">
+                    <Plus className="w-4 h-4" /> Create Workspace
+                  </span>
+                  <Lock className="w-3.5 h-3.5 text-slate-500" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         <nav className="flex-1 overflow-y-auto px-3 py-2 space-y-1 hide-scrollbar">
@@ -110,14 +154,19 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, title, subtitle,
               <Link
                 key={item.name}
                 to={item.path}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-astrix-teal ${
+                className={`flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-astrix-teal ${
                   isActive 
                     ? 'bg-sidebar-active text-white shadow-md' 
                     : 'text-slate-400 hover:bg-sidebar-hover hover:text-white'
                 }`}
               >
-                <item.icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-white'}`} />
-                {item.name}
+                <div className="flex items-center gap-3">
+                  <item.icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-white'}`} />
+                  {item.name}
+                </div>
+                {item.pro && (
+                  <span className="bg-gradient-to-r from-astrix-teal to-blue-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider shadow-sm">PRO</span>
+                )}
               </Link>
             );
           })}
@@ -165,6 +214,9 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children, title, subtitle,
           </div>
           
           <div className="flex items-center gap-2 md:gap-4 shrink-0">
+            <Link to="/pricing" className="hidden lg:flex items-center gap-1.5 bg-brand-yellow/10 text-yellow-700 border border-brand-yellow/20 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-brand-yellow/20 transition-colors">
+              <Sparkles className="w-3.5 h-3.5" /> Upgrade Plan
+            </Link>
             <div className="hidden lg:flex items-center bg-gray-100 border border-gray-200 rounded-lg px-3 py-1.5 cursor-pointer hover:bg-gray-200 transition-colors group">
               <Search className="w-3.5 h-3.5 text-gray-400 mr-2 group-hover:text-gray-600" />
               <span className="text-xs font-bold text-gray-400 group-hover:text-gray-600">Search signals...</span>

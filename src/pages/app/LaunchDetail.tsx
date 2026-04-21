@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AppLayout } from '../../layouts/AppLayout';
-import { Link, useParams } from 'react-router-dom';
-import { Rocket, CheckCircle2, Clock, ArrowLeft, Save, Loader2, Sparkles, TrendingUp } from 'lucide-react';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Rocket, CheckCircle2, Clock, ArrowLeft, Save, Loader2, Sparkles, TrendingUp, Lock } from 'lucide-react';
 import { useToast } from '../../contexts/ToastContext';
 import { useLaunches, api } from '../../lib/api';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
@@ -9,6 +9,7 @@ import { useWorkspace } from '../../contexts/WorkspaceContext';
 export const LaunchDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { addToast } = useToast();
+  const navigate = useNavigate();
   const { activeWorkspace } = useWorkspace();
   const { data: launches } = useLaunches(activeWorkspace?.id);
 
@@ -20,6 +21,7 @@ export const LaunchDetail = () => {
     notes: '' 
   });
   const [isSaving, setIsSaving] = useState(false);
+  const [isAdvancedReviewing, setIsAdvancedReviewing] = useState(false);
 
   const launch = launches.find(l => l.id === id);
 
@@ -52,6 +54,12 @@ export const LaunchDetail = () => {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleAdvancedReview = () => {
+    // Mocking the Growth/Scale plan restriction
+    addToast("Advanced Launch Reviews require the Growth or Scale plan.", "warning");
+    navigate('/pricing');
   };
 
   if (!launch) {
@@ -154,9 +162,17 @@ export const LaunchDetail = () => {
           </div>
 
           <div className="bg-white border border-gray-200 rounded-2xl p-6 md:p-8 shadow-sm">
-            <h3 className="font-heading text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
-              <CheckCircle2 className="w-5 h-5 text-astrix-teal" /> Final Verdict & Proof Summary
-            </h3>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="font-heading text-lg font-bold text-gray-900 flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-astrix-teal" /> Final Verdict & Proof Summary
+              </h3>
+              <button 
+                onClick={handleAdvancedReview}
+                className="hidden sm:flex items-center gap-1.5 bg-gradient-to-r from-astrix-teal to-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-sm hover:shadow-md transition-all group"
+              >
+                <Sparkles className="w-3.5 h-3.5" /> Run Advanced AI Review <Lock className="w-3 h-3 opacity-70 ml-1" />
+              </button>
+            </div>
             
             <div className="space-y-6">
               <div>

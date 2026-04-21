@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { MainLayout } from '../layouts/MainLayout';
-import { Check, HelpCircle, Loader2 } from 'lucide-react';
+import { Check, HelpCircle, Loader2, Sparkles } from 'lucide-react';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useToast } from '../contexts/ToastContext';
@@ -14,58 +14,100 @@ export const Pricing = () => {
   const { addToast } = useToast();
   const navigate = useNavigate();
   const [loadingTier, setLoadingTier] = useState<string | null>(null);
+  const [isAnnual, setIsAnnual] = useState(true);
 
   const tiers = [
     {
       name: "Free",
-      displayPrice: "$0",
-      period: "forever",
+      monthlyPrice: "₹0",
+      annualPrice: "₹0",
+      period: "/month",
+      annualBilled: "Free forever",
       desc: "For solo founders and PMs validating the evidence-based product loop.",
       features: [
-        "1 Member + 2 Viewers",
+        "1 Member, 2 Viewers",
         "1 Workspace",
-        "200 signals (Lifetime total)",
-        "CSV upload & manual entry",
-        "Sample workspace included",
-        "Standard launch reviews & verdicts"
+        "200 signals / month",
+        "100 AI Classifications / month",
+        "5 AI Memos / month",
+        "Standard Launch Reviews",
+        "AI Model: Gemini",
+      ],
+      comingSoon: [
+        "Advanced Analytics"
       ],
       cta: "Start Free",
       popular: false
     },
     {
       name: "Starter",
-      displayPrice: "$59",
+      monthlyPrice: "₹59",
+      annualPrice: "₹49", 
       period: "/month",
+      annualBilled: "Billed ₹588 yearly",
       desc: "For early-stage startups establishing their first evidence-based product loop.",
       features: [
-        "Up to 3 Members + Unlimited Viewers",
+        "3 Members, Unlimited Viewers",
         "1 Workspace",
-        "2,000 signals/month",
-        "CSV upload & manual entry",
-        "Sample workspace included",
-        "500 AI classifications & 20 memos",
-        "Launch reviews & verdicts",
-        "Email support"
+        "2,000 signals / month",
+        "500 AI Classifications / month",
+        "20 AI Memos / month",
+        "Standard Launch Reviews",
+        "AI Model: Gemini",
+      ],
+      comingSoon: [
+        "Advanced Analytics"
       ],
       cta: "Start with Starter",
       popular: false
     },
     {
       name: "Growth",
-      displayPrice: "$179",
+      monthlyPrice: "₹179",
+      annualPrice: "₹149", 
       period: "/month",
+      annualBilled: "Billed ₹1,788 yearly",
       desc: "For scaling product teams that need deeper signal volume and team collaboration.",
       features: [
-        "Up to 8 Members + Unlimited Viewers",
+        "8 Members, Unlimited Viewers",
         "1 Workspace",
-        "10,000 signals/month",
-        "CSV upload & manual entry",
-        "2,500 AI classifications & 100 memos",
-        "Launch reviews & verdicts",
-        "Priority support"
+        "10,000 signals / month",
+        "2,500 AI Classifications / month",
+        "100 AI Memos / month",
+        "Ask Assistant",
+        "Advanced Launch Reviews",
+        "AI Model: Gemini + OpenRouter",
       ],
-      cta: "Talk to Founder",
+      comingSoon: [
+        "Advanced Analytics"
+      ],
+      cta: "Start with Growth",
       popular: true
+    },
+    {
+      name: "Scale",
+      monthlyPrice: "₹449",
+      annualPrice: "₹369", 
+      period: "/month",
+      annualBilled: "Billed ₹4,428 yearly",
+      desc: "For large organizations requiring maximum volume, security, and premium AI models.",
+      features: [
+        "20 Members, Unlimited Viewers",
+        "10 Workspaces",
+        "50,000 signals / month",
+        "10,000 AI Classifications / month",
+        "500 AI Memos / month",
+        "Ask Assistant",
+        "Audit Log & Priority Support",
+        "Advanced Launch Reviews",
+        "AI Model: Grok",
+      ],
+      comingSoon: [
+        "Advanced Analytics",
+        "Jira Two-Way Sync"
+      ],
+      cta: "Start with Scale",
+      popular: false
     }
   ];
 
@@ -89,7 +131,6 @@ export const Pricing = () => {
 
     setLoadingTier(tier.name);
     
-    // Simulate checkout redirect for frontend prototype
     setTimeout(() => {
       setLoadingTier(null);
       addToast(`Redirecting to checkout for ${tier.name} plan...`, "success");
@@ -105,32 +146,54 @@ export const Pricing = () => {
             Simple pricing. <br/>
             <span className="text-brand-blue">Serious value.</span>
           </h1>
-          <p className={`text-lg md:text-xl text-gray-600 font-medium max-w-2xl mx-auto mb-12 transition-all duration-700 delay-100 ${headerVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+          <p className={`text-lg md:text-xl text-gray-600 font-medium max-w-2xl mx-auto mb-10 transition-all duration-700 delay-100 ${headerVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
             The accountability loop for every stage of growth.
           </p>
+
+          {/* Billing Toggle */}
+          <div className={`flex items-center justify-center gap-4 transition-all duration-700 delay-200 ${headerVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+            <span className={`text-sm font-bold ${!isAnnual ? 'text-gray-900' : 'text-gray-500'}`}>Monthly</span>
+            <button 
+              onClick={() => setIsAnnual(!isAnnual)}
+              className="w-14 h-7 bg-brand-blue rounded-full relative transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-blue/30"
+              aria-label="Toggle annual billing"
+            >
+              <div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-transform duration-300 shadow-sm ${isAnnual ? 'translate-x-8' : 'translate-x-1'}`} />
+            </button>
+            <span className={`text-sm font-bold flex items-center gap-2 ${isAnnual ? 'text-gray-900' : 'text-gray-500'}`}>
+              Annually <span className="bg-green-100 text-green-700 text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider">Save ~17%</span>
+            </span>
+          </div>
         </div>
       </div>
 
       {/* Pricing Cards */}
-      <div className="max-w-[1400px] mx-auto px-4 md:px-8 -mt-12 relative z-10 mb-32" ref={cardsRef}>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-[1100px] mx-auto">
+      <div className="max-w-[1400px] mx-auto px-4 md:px-6 -mt-12 relative z-10 mb-32" ref={cardsRef}>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 max-w-[1400px] mx-auto">
           {tiers.map((tier, i) => (
             <div 
               key={i} 
-              className={`relative rounded-3xl p-6 lg:p-8 flex flex-col transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-2 ${cardsVisible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'} ${tier.popular ? 'bg-brand-blue text-white shadow-glow-blue lg:scale-105 z-20 border-none' : 'bg-white text-gray-900 shadow-apple border border-gray-200'}`}
+              className={`relative rounded-3xl p-6 lg:p-8 flex flex-col transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-2 ${cardsVisible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'} ${tier.popular ? 'bg-brand-blue text-white shadow-glow-blue xl:scale-105 z-20 border-none' : 'bg-white text-gray-900 shadow-apple border border-gray-200'}`}
               style={{ transitionDelay: `${i * 100}ms` }}
             >
               {tier.popular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-brand-yellow text-gray-900 text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-widest shadow-sm border border-yellow-300/50">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-brand-yellow text-gray-900 text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-widest shadow-sm border border-yellow-300/50 whitespace-nowrap">
                   Most Popular
                 </div>
               )}
               <h3 className={`text-xl font-heading font-bold mb-2 ${tier.popular ? 'text-white' : 'text-gray-900'}`}>{tier.name}</h3>
-              <p className={`text-sm mb-6 h-12 font-medium ${tier.popular ? 'text-blue-100' : 'text-gray-500'}`}>{tier.desc}</p>
-              <div className="mb-8">
-                <span className="text-4xl lg:text-5xl font-heading font-black tracking-tighter">{tier.displayPrice}</span>
+              <p className={`text-sm mb-6 h-16 font-medium ${tier.popular ? 'text-blue-100' : 'text-gray-500'}`}>{tier.desc}</p>
+              
+              <div className="mb-2">
+                <span className="text-4xl lg:text-5xl font-heading font-black tracking-tighter">
+                  {isAnnual ? tier.annualPrice : tier.monthlyPrice}
+                </span>
                 {tier.period && <span className={`text-sm font-bold ${tier.popular ? 'text-blue-200' : 'text-gray-400'}`}>{tier.period}</span>}
               </div>
+              <div className={`text-xs font-medium mb-8 h-4 ${tier.popular ? 'text-blue-200' : 'text-gray-400'}`}>
+                {isAnnual && tier.annualPrice !== "₹0" ? tier.annualBilled : (tier.annualPrice === "₹0" ? "Free forever" : "Billed monthly")}
+              </div>
+
               <ul className="space-y-4 mb-8 flex-1">
                 {tier.features.map((feat, j) => (
                   <li key={j} className="flex items-start gap-3 text-sm font-medium">
@@ -138,7 +201,18 @@ export const Pricing = () => {
                     <span className={tier.popular ? 'text-blue-50' : 'text-gray-600'}>{feat}</span>
                   </li>
                 ))}
+                
+                {/* Coming Soon Features */}
+                {tier.comingSoon.map((feat, j) => (
+                  <li key={`cs-${j}`} className="flex items-start gap-3 text-sm font-medium opacity-70">
+                    <Sparkles className={`w-5 h-5 shrink-0 ${tier.popular ? 'text-blue-300' : 'text-gray-400'}`} />
+                    <span className={tier.popular ? 'text-blue-100' : 'text-gray-500'}>
+                      {feat} <span className="text-[10px] uppercase tracking-wider font-bold ml-1 opacity-80">(Coming Soon)</span>
+                    </span>
+                  </li>
+                ))}
               </ul>
+
               <button 
                 onClick={() => handleCheckout(tier)}
                 disabled={loadingTier === tier.name}

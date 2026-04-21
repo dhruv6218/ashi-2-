@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AppLayout } from '../../layouts/AppLayout';
-import { Building2, Users, CreditCard, Loader2, Trash2, Plus, X, Box, Target } from 'lucide-react';
+import { Building2, Users, CreditCard, Loader2, Trash2, Plus, X, Box, Target, ShieldCheck, Eye, Activity } from 'lucide-react';
 import { useToast } from '../../contexts/ToastContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { Link, useSearchParams } from 'react-router-dom';
@@ -32,11 +32,13 @@ export const Settings = () => {
     { id: 'segments', name: 'Segments', icon: Target },
     { id: 'team', name: 'Team Members', icon: Users },
     { id: 'billing', name: 'Billing & Quotas', icon: CreditCard },
+    { id: 'activity', name: 'Audit Log', icon: Activity },
   ];
 
   const fetchSubscription = async () => {
     if (!activeWorkspace) return;
-    setSubscription(null);
+    // Mocking subscription state for the Free tier
+    setSubscription({ plan_type: 'Free', member_limit: 1, viewer_limit: 2 });
   };
 
   useEffect(() => {
@@ -57,6 +59,11 @@ export const Settings = () => {
     if (!activeWorkspace || !inviteEmail) return;
     setIsSendingInvite(true);
     try {
+      // Mock limits check
+      if (inviteRole !== 'viewer' && members.filter(m => m.role !== 'viewer').length >= (subscription?.member_limit || 1)) {
+         throw new Error("Member limit reached for your current plan. Please upgrade to invite more editors.");
+      }
+      
       await api.team.invite(activeWorkspace.id, inviteEmail, inviteRole);
       addToast("Invitation sent successfully", "success");
       setIsInviteModalOpen(false);
@@ -74,6 +81,9 @@ export const Settings = () => {
     addToast("Member removed", "success");
     refetchTeam();
   };
+
+  const activeEditors = members.filter(m => m.role !== 'viewer').length;
+  const activeViewers = members.filter(m => m.role === 'viewer').length;
 
   return (
     <AppLayout title="Settings">
@@ -128,6 +138,28 @@ export const Settings = () => {
                     <button onClick={() => setIsInviteModalOpen(true)} className="text-sm font-bold text-white bg-astrix-teal px-4 py-2 rounded-lg hover:bg-teal-700 flex items-center gap-2"><Plus className="w-4 h-4"/> Invite Member</button>
                   </div>
 
+                  {/* Quota display for Free/Starter plans */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                    <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-1.5"><ShieldCheck className="w-4 h-4"/> Editors (Members)</span>
+                        <span className="text-sm font-bold text-gray-900">{activeEditors} / {subscription?.member_limit || 1}</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-1.5">
+                        <div className="bg-astrix-teal h-1.5 rounded-full" style={{ width: `${Math.min(100, (activeEditors / (subscription?.member_limit || 1)) * 100)}%` }}></div>
+                      </div>
+                    </div>
+                    <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-1.5"><Eye className="w-4 h-4"/> Viewers (Read-only)</span>
+                        <span className="text-sm font-bold text-gray-900">{activeViewers} / {subscription?.viewer_limit === -1 ? 'Unlimited' : subscription?.viewer_limit || 2}</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-1.5">
+                        <div className="bg-brand-blue h-1.5 rounded-full" style={{ width: subscription?.viewer_limit === -1 ? '10%' : `${Math.min(100, (activeViewers / (subscription?.viewer_limit || 2)) * 100)}%` }}></div>
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="space-y-6">
                     <div>
                       <h4 className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-3">Active Members ({members.length})</h4>
@@ -144,7 +176,9 @@ export const Settings = () => {
                               </div>
                             </div>
                             <div className="flex items-center gap-4">
-                              <span className="text-xs font-mono font-bold text-gray-500 uppercase bg-gray-100 px-2 py-1 rounded">{member.role}</span>
+                              <span className={`text-xs font-mono font-bold uppercase px-2 py-1 rounded ${member.role === 'viewer' ? 'bg-blue-50 text-brand-blue' : 'bg-gray-100 text-gray-600'}`}>
+                                {member.role}
+                              </span>
                               <button onClick={() => removeMember(member.id)} className="text-gray-400 hover:text-red-500"><Trash2 className="w-4 h-4"/></button>
                             </div>
                           </div>
@@ -216,6 +250,26 @@ export const Settings = () => {
                   </div>
                 </div>
               )}
+
+              {activeTab === 'activity' && (
+                <div className="animate-[fadeIn_0.3s_ease-out]">
+                  <h3 className="font-heading text-xl font-bold text-gray-900 mb-6 border-b border-gray-100 pb-4">Audit Log</h3>
+                  {subscription?.plan_type === 'Scale' ? (
+                     <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+                       <div className="p-6 text-center text-gray-500">
+                          <p>Audit log entries will appear here.</p>
+                       </div>
+                     </div>
+                  ) : (
+                     <div className="bg-gray-50 border border-gray-200 rounded-2xl p-8 text-center max-w-2xl">
+                       <ShieldCheck className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                       <h4 className="text-lg font-bold text-gray-900 mb-2">Audit Log is a Scale Plan Feature</h4>
+                       <p className="text-sm text-gray-500 mb-6">Upgrade to the Scale plan to track all workspace activity, data exports, and security events.</p>
+                       <Link to="/pricing" className="bg-astrix-teal text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-sm hover:bg-teal-700 inline-block">View Plans</Link>
+                     </div>
+                  )}
+                </div>
+              )}
             </>
           )}
         </div>
@@ -238,7 +292,8 @@ export const Settings = () => {
               <div>
                 <label className="block text-sm font-bold text-gray-900 mb-1">Role</label>
                 <select value={inviteRole} onChange={e => setInviteRole(e.target.value)} className="w-full bg-gray-50 border border-gray-200 text-sm rounded-xl p-3 outline-none focus:ring-2 focus:ring-astrix-teal">
-                  <option value="member">Member (Can view and edit)</option>
+                  <option value="viewer">Viewer (Read-only, Unlimited on paid plans)</option>
+                  <option value="member">Member (Can create decisions & artifacts)</option>
                   <option value="admin">Admin (Can manage settings and billing)</option>
                 </select>
               </div>

@@ -39,11 +39,12 @@ import { EvidenceView } from './pages/app/EvidenceView';
 import { DecisionsHistory } from './pages/app/DecisionsHistory';
 import { DecisionDetail } from './pages/app/DecisionDetail';
 import { ArtifactStudio } from './pages/app/ArtifactStudio';
+import { ArtifactDetail } from './pages/app/ArtifactDetail';
 import { PostLaunchTracker } from './pages/app/PostLaunchTracker';
 import { LaunchDetail } from './pages/app/LaunchDetail';
+import { Assistant } from './pages/app/Assistant';
 import { Settings } from './pages/app/Settings';
 import { AccountDetail } from './pages/app/AccountDetail';
-import { ArtifactDetail } from './pages/app/ArtifactDetail';
 
 function App() {
   useMousePosition();
@@ -79,9 +80,11 @@ function App() {
               {/* Protected Main App Routes */}
               <Route path="/app" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/app/dashboard" element={<Navigate to="/app" replace />} />
+              
               <Route path="/app/signals" element={<ProtectedRoute><SignalExplorer /></ProtectedRoute>} />
               <Route path="/app/signals/new" element={<ProtectedRoute><SignalExplorer defaultOpenAdd /></ProtectedRoute>} />
               <Route path="/app/signals/:id" element={<ProtectedRoute><SignalExplorer /></ProtectedRoute>} />
+              
               <Route path="/app/accounts" element={<ProtectedRoute><AccountsList /></ProtectedRoute>} />
               <Route path="/app/accounts/:id" element={<ProtectedRoute><AccountDetail /></ProtectedRoute>} />
               
@@ -100,6 +103,8 @@ function App() {
               
               <Route path="/app/launches" element={<ProtectedRoute><PostLaunchTracker /></ProtectedRoute>} />
               <Route path="/app/launches/:id" element={<ProtectedRoute><LaunchDetail /></ProtectedRoute>} />
+              
+              <Route path="/app/assistant" element={<ProtectedRoute><Assistant /></ProtectedRoute>} />
               
               <Route path="/app/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
               

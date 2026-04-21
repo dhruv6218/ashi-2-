@@ -34,6 +34,7 @@ export interface Account {
   health_score: string | null;
   signal_count?: number;
   last_signal_date?: string;
+  renewal_date?: string;
   created_at: string;
 }
 
