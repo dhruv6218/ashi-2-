@@ -26,6 +26,9 @@ export const Settings = () => {
   const [inviteRole, setInviteRole] = useState('member');
   const [isSendingInvite, setIsSendingInvite] = useState(false);
 
+  // Mock activity log data (will be wired to real activity_logs table later)
+  const mockActivities: { action: string; object_type: string; actor: string; time: string }[] = [];
+
   const tabs = [
     { id: 'workspace', name: 'Workspace', icon: Building2 },
     { id: 'areas', name: 'Product Areas', icon: Box },
@@ -253,21 +256,33 @@ export const Settings = () => {
 
               {activeTab === 'activity' && (
                 <div className="animate-[fadeIn_0.3s_ease-out]">
-                  <h3 className="font-heading text-xl font-bold text-gray-900 mb-6 border-b border-gray-100 pb-4">Audit Log</h3>
-                  {subscription?.plan_type === 'Scale' ? (
-                     <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-                       <div className="p-6 text-center text-gray-500">
-                          <p>Audit log entries will appear here.</p>
-                       </div>
-                     </div>
-                  ) : (
-                     <div className="bg-gray-50 border border-gray-200 rounded-2xl p-8 text-center max-w-2xl">
-                       <ShieldCheck className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                       <h4 className="text-lg font-bold text-gray-900 mb-2">Audit Log is a Scale Plan Feature</h4>
-                       <p className="text-sm text-gray-500 mb-6">Upgrade to the Scale plan to track all workspace activity, data exports, and security events.</p>
-                       <Link to="/pricing" className="bg-astrix-teal text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-sm hover:bg-teal-700 inline-block">View Plans</Link>
-                     </div>
-                  )}
+                  <h3 className="font-heading text-xl font-bold text-gray-900 mb-6 border-b border-gray-100 pb-4">Activity Log</h3>
+                  <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+                    {mockActivities.length === 0 ? (
+                      <div className="p-8 text-center text-gray-500">
+                        <Activity className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+                        <p className="text-sm font-medium">No activity recorded yet.</p>
+                        <p className="text-xs text-gray-400 mt-1">Actions will appear here as you use the workspace.</p>
+                      </div>
+                    ) : (
+                      <div className="divide-y divide-gray-100">
+                        {mockActivities.map((activity, i) => (
+                          <div key={i} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500">
+                                <Activity className="w-4 h-4" />
+                              </div>
+                              <div>
+                                <div className="text-sm font-bold text-gray-900">{activity.action}</div>
+                                <div className="text-xs text-gray-500">{activity.object_type} • {activity.actor}</div>
+                              </div>
+                            </div>
+                            <div className="text-xs text-gray-400 font-mono">{activity.time}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </>

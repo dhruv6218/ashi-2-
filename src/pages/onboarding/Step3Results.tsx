@@ -2,16 +2,42 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { OnboardingLayout } from '../../layouts/OnboardingLayout';
 import { Database, UploadCloud, Rocket, CheckCircle2, Loader2, ArrowRight } from 'lucide-react';
+import {
+  MOCK_SIGNALS,
+  MOCK_ACCOUNTS,
+  MOCK_PROBLEMS,
+  MOCK_OPPORTUNITIES,
+  MOCK_DECISIONS,
+  MOCK_ARTIFACTS,
+  MOCK_LAUNCHES,
+  MOCK_MEMBERS
+} from '../../lib/mockData';
+import { mockDb, triggerUpdate } from '../../lib/api';
 
 export const Step3Results = () => {
   const navigate = useNavigate();
   const [isInitializing, setIsInitializing] = useState(false);
   const [activeStrategy, setActiveStrategy] = useState<'sample' | 'import' | null>(null);
 
+  const seedSampleWorkspace = () => {
+    // Clear and seed sample data into the mock database
+    mockDb.signals = [...MOCK_SIGNALS];
+    mockDb.accounts = [...MOCK_ACCOUNTS];
+    mockDb.problems = [...MOCK_PROBLEMS];
+    mockDb.opportunities = [...MOCK_OPPORTUNITIES];
+    mockDb.decisions = [...MOCK_DECISIONS];
+    mockDb.artifacts = [...MOCK_ARTIFACTS];
+    mockDb.launches = [...MOCK_LAUNCHES];
+    mockDb.members = [...MOCK_MEMBERS];
+    triggerUpdate();
+  };
+
   const handleFinish = async () => {
     setIsInitializing(true);
-    // Simulate space initialization
-    await new Promise(r => setTimeout(r, 2000));
+    if (activeStrategy === 'sample') {
+      seedSampleWorkspace();
+    }
+    await new Promise(r => setTimeout(r, 1500));
     navigate('/app');
   };
 

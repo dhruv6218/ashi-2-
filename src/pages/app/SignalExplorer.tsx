@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { AppLayout } from '../../layouts/AppLayout';
 import { Search, Hash, MessageCircle, Github, AlertCircle, X, FileSpreadsheet, Database, UploadCloud, Plus, Loader2 } from 'lucide-react';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
+import { useNavigate } from 'react-router-dom';
 import { useSignals, useAccounts, api, triggerUpdate } from '../../lib/api';
 import { Signal } from '../../types';
 import { TableSkeleton } from '../../components/ui/Skeleton';
@@ -19,6 +20,7 @@ import {
 export const SignalExplorer = ({ defaultOpenAdd = false }: { defaultOpenAdd?: boolean }) => {
   const { activeWorkspace } = useWorkspace();
   const { addToast } = useToast();
+  const navigate = useNavigate();
   
   const [selectedSignalId, setSelectedSignalId] = useState<string | null>(null);
   const [globalFilter, setGlobalFilter] = useState('');
@@ -290,8 +292,8 @@ export const SignalExplorer = ({ defaultOpenAdd = false }: { defaultOpenAdd?: bo
                     {table.getRowModel().rows.map(row => (
                       <tr 
                         key={row.id} 
-                        onClick={() => setSelectedSignalId(row.original.id)}
-                        className={`cursor-pointer transition-colors ${selectedSignalId === row.original.id ? 'bg-blue-50/50' : 'hover:bg-gray-50'}`}
+                        onClick={() => navigate(`/app/signals/${row.original.id}`)}
+                        className={`cursor-pointer transition-colors hover:bg-gray-50`}
                       >
                         {row.getVisibleCells().map(cell => (
                           <td key={cell.id} className="p-4">
@@ -311,8 +313,8 @@ export const SignalExplorer = ({ defaultOpenAdd = false }: { defaultOpenAdd?: bo
                   return (
                     <div 
                       key={row.id} 
-                      onClick={() => setSelectedSignalId(sig.id)} 
-                      className={`border p-4 rounded-xl shadow-sm flex flex-col gap-3 cursor-pointer transition-colors ${selectedSignalId === sig.id ? 'bg-blue-50/50 border-brand-blue/30' : 'bg-white border-gray-200 hover:bg-gray-50'}`}
+                      onClick={() => navigate(`/app/signals/${sig.id}`)} 
+                      className={`border p-4 rounded-xl shadow-sm flex flex-col gap-3 cursor-pointer transition-colors bg-white border-gray-200 hover:bg-gray-50`}
                     >
                       <div className="flex justify-between items-start">
                         <div className="flex items-center gap-2">

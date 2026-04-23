@@ -58,6 +58,14 @@ export const api = {
       const signal = mockDb.signals.find(s => s.id === id);
       const account = signal?.account_id ? mockDb.accounts.find(a => a.id === signal.account_id) : null;
       return { ...signal, accounts: account };
+    },
+    update: async (id: string, data: Partial<Signal>) => {
+      await delay();
+      const idx = mockDb.signals.findIndex(s => s.id === id);
+      if (idx === -1) throw new Error('Signal not found');
+      mockDb.signals[idx] = { ...mockDb.signals[idx], ...data };
+      triggerUpdate();
+      return mockDb.signals[idx];
     }
   },
   accounts: {

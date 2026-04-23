@@ -45,6 +45,7 @@ import { LaunchDetail } from './pages/app/LaunchDetail';
 import { Assistant } from './pages/app/Assistant';
 import { Settings } from './pages/app/Settings';
 import { AccountDetail } from './pages/app/AccountDetail';
+import { SignalDetail } from './pages/app/SignalDetail';
 
 function App() {
   useMousePosition();
@@ -83,7 +84,7 @@ function App() {
               
               <Route path="/app/signals" element={<ProtectedRoute><SignalExplorer /></ProtectedRoute>} />
               <Route path="/app/signals/new" element={<ProtectedRoute><SignalExplorer defaultOpenAdd /></ProtectedRoute>} />
-              <Route path="/app/signals/:id" element={<ProtectedRoute><SignalExplorer /></ProtectedRoute>} />
+              <Route path="/app/signals/:id" element={<ProtectedRoute><SignalDetail /></ProtectedRoute>} />
               
               <Route path="/app/accounts" element={<ProtectedRoute><AccountsList /></ProtectedRoute>} />
               <Route path="/app/accounts/:id" element={<ProtectedRoute><AccountDetail /></ProtectedRoute>} />

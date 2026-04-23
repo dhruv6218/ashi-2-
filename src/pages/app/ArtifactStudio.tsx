@@ -20,7 +20,15 @@ export const ArtifactStudio = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState('');
   const [showVersions, setShowVersions] = useState(false);
-  const [versions] = useState([{ id: 'v1', number: 1, date: 'Today', label: 'Current' }]);
+  // Track versions per artifact: artifact_id -> array of { content, updated_at, version_number }
+  const [artifactVersions, setArtifactVersions] = useState<Record<string, { content: string; updated_at: string; version_number: number }[]>>({});
+
+  const getVersionsForArtifact = (artifactId: string) => {
+    const stored = artifactVersions[artifactId] || [];
+    // Always include current artifact as latest version
+    const currentVersion = { content: selectedArtifact?.content || '', updated_at: selectedArtifact?.updated_at || new Date().toISOString(), version_number: stored.length + 1 };
+    return [...stored, currentVersion].slice(-3); // Keep last 3
+  };
   
   const [isGenerating, setIsGenerating] = useState(false);
   const [loadingStage, setLoadingStage] = useState('');
@@ -63,11 +71,21 @@ export const ArtifactStudio = () => {
     }
   };
 
+  const [viewingVersion, setViewingVersion] = useState<number | null>(null);
+
   const handleSaveEdit = async () => {
     if (!selectedArtifact) return;
+    // Push current content as a previous version before saving
+    const prevVersions = artifactVersions[selectedArtifact.id] || [];
+    const updatedVersions = [...prevVersions, { content: selectedArtifact.content, updated_at: selectedArtifact.updated_at, version_number: prevVersions.length + 1 }].slice(-2); // Keep up to 2 previous versions (current becomes 3rd)
+    setArtifactVersions(prev => ({ ...prev, [selectedArtifact.id]: updatedVersions }));
+
     await api.artifacts.update(selectedArtifact.id, { content: editContent });
-    setSelectedArtifact({ ...selectedArtifact, content: editContent });
+    const updated = { ...selectedArtifact, content: editContent, updated_at: new Date().toISOString() };
+    setSelectedArtifact(updated);
+    setDisplayedContent(editContent);
     setIsEditing(false);
+    setViewingVersion(null);
     addToast('Changes saved as new version', 'success');
   };
 
@@ -163,16 +181,20 @@ export const ArtifactStudio = () => {
                   <AIBadge />
                   <div className="relative">
                     <button onClick={() => setShowVersions(!showVersions)} className="flex items-center gap-1.5 bg-white border border-gray-200 px-3 py-1.5 rounded-lg text-xs font-bold text-gray-700 hover:bg-gray-50 shadow-sm">
-                      Version 1 (Current) <ChevronDown className="w-3 h-3" />
+                      Version {getVersionsForArtifact(selectedArtifact.id).length}{viewingVersion === null ? ' (Current)' : ` (Viewing v${viewingVersion})`} <ChevronDown className="w-3 h-3" />
                     </button>
                     {showVersions && (
-                      <div className="absolute top-full left-0 mt-1 w-52 bg-white border border-gray-200 rounded-xl shadow-xl z-20 py-1 animate-[fadeIn_0.15s_ease-out]">
-                        {versions.map(v => (
-                          <button key={v.id} onClick={() => setShowVersions(false)} className="w-full text-left px-4 py-2.5 text-xs font-bold hover:bg-gray-50 text-gray-700 flex justify-between items-center">
-                            <span>Version {v.number} {v.label && <span className="text-gray-400 font-normal">({v.label})</span>}</span>
-                            <span className="text-gray-400 font-normal text-[10px]">{v.date}</span>
-                          </button>
-                        ))}
+                      <div className="absolute top-full left-0 mt-1 w-56 bg-white border border-gray-200 rounded-xl shadow-xl z-20 py-1 animate-[fadeIn_0.15s_ease-out]">
+                        {getVersionsForArtifact(selectedArtifact.id).map((v, idx) => {
+                          const isCurrent = idx === getVersionsForArtifact(selectedArtifact.id).length - 1;
+                          const isViewing = viewingVersion === v.version_number || (viewingVersion === null && isCurrent);
+                          return (
+                            <button key={v.version_number} onClick={() => { setViewingVersion(isCurrent ? null : v.version_number); setDisplayedContent(v.content); setShowVersions(false); }} className={`w-full text-left px-4 py-2.5 text-xs font-bold hover:bg-gray-50 flex justify-between items-center ${isViewing ? 'bg-teal-50 text-astrix-teal' : 'text-gray-700'}`}>
+                              <span>Version {v.version_number} {isCurrent && <span className="text-gray-400 font-normal">(Current)</span>}</span>
+                              <span className="text-gray-400 font-normal text-[10px]">{formatDate(v.updated_at)}</span>
+                            </button>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
