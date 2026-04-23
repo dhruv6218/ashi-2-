@@ -1,9 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { MOCK_USER } from '../lib/mockData';
+import type { Session, User } from '@supabase/supabase-js';
+import { supabase } from '../lib/supabase';
 
 interface AuthContextType {
-  session: any;
-  user: any;
+  session: Session | null;
+  user: User | null;
   isInitializing: boolean;
   signOut: () => Promise<void>;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
@@ -26,62 +27,69 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [session, setSession] = useState<any>(null);
-  const [user, setUser] = useState<any>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {
-    const initAuth = async () => {
-      setIsInitializing(true);
-      // Simulate Supabase async session hydration
-      await new Promise(resolve => setTimeout(resolve, 600));
-      
-      // For the sake of strict backend-readiness, we remove localStorage hacks.
-      // A real Supabase client would call supabase.auth.getSession() here.
-      // We default to logged out to ensure the hydration flow is respected.
-      setUser(null);
-      setSession(null);
+    // Hydrate session from Supabase on mount
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session);
+      setUser(data.session?.user ?? null);
       setIsInitializing(false);
-    };
-    
-    initAuth();
+    });
+
+    // Subscribe to auth state changes (login, logout, token refresh, etc.)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      setSession(newSession);
+      setUser(newSession?.user ?? null);
+      setIsInitializing(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  const simulateDelay = () => new Promise(resolve => setTimeout(resolve, 800));
-
-  const signIn = async (email: string, password: string) => {
-    await simulateDelay();
-    setUser(MOCK_USER);
-    setSession({ access_token: 'mock_token' });
+  const signIn = async (email: string, password: string): Promise<{ error: string | null }> => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) return { error: error.message };
     return { error: null };
   };
 
-  const signUp = async (email: string, password: string, name: string) => {
-    await simulateDelay();
-    setUser({ ...MOCK_USER, email, user_metadata: { full_name: name } });
-    setSession({ access_token: 'mock_token' });
-    return { error: null, needsConfirmation: false };
+  const signUp = async (
+    email: string,
+    password: string,
+    name: string,
+  ): Promise<{ error: string | null; needsConfirmation: boolean }> => {
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { full_name: name } },
+    });
+    if (error) return { error: error.message, needsConfirmation: false };
+    // Supabase may require email confirmation depending on project settings
+    const needsConfirmation = !data.session;
+    return { error: null, needsConfirmation };
   };
 
-  const signInWithGoogle = async () => {
-    await simulateDelay();
-    setUser(MOCK_USER);
-    setSession({ access_token: 'mock_token' });
+  const signInWithGoogle = async (): Promise<void> => {
+    const redirectTo = `${window.location.origin}/app`;
+    await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo } });
   };
 
-  const signOut = async () => {
-    await simulateDelay();
-    setUser(null);
-    setSession(null);
+  const signOut = async (): Promise<void> => {
+    await supabase.auth.signOut();
   };
 
-  const resetPassword = async (email: string) => {
-    await simulateDelay();
+  const resetPassword = async (email: string): Promise<{ error: string | null }> => {
+    const redirectTo = `${window.location.origin}/reset-password`;
+    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+    if (error) return { error: error.message };
     return { error: null };
   };
 
-  const updatePassword = async (password: string) => {
-    await simulateDelay();
+  const updatePassword = async (password: string): Promise<{ error: string | null }> => {
+    const { error } = await supabase.auth.updateUser({ password });
+    if (error) return { error: error.message };
     return { error: null };
   };
 

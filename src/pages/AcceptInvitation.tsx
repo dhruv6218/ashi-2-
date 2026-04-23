@@ -4,6 +4,7 @@ import { Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
+import { supabase } from '../lib/supabase';
 
 export const AcceptInvitation = () => {
   const [searchParams] = useSearchParams();
@@ -28,16 +29,32 @@ export const AcceptInvitation = () => {
       return;
     }
 
-    // Simulate fetching invite
-    setTimeout(() => {
-      setInviteDetails({
-        workspace_name: 'Demo Workspace',
-        inviter_name: 'Admin',
-        email: 'demo@astrix.ai',
-        role: 'member'
+    // Look up the invitation by token via public policy
+    supabase
+      .from('invitations')
+      .select(`
+        invited_email, invited_role, status, expires_at,
+        workspaces:workspace_id(name),
+        inviters:invited_by(full_name)
+      `)
+      .eq('token', token)
+      .eq('status', 'pending')
+      .single()
+      .then(({ data, error: fetchErr }) => {
+        if (fetchErr || !data) {
+          setError('This invitation is invalid, has already been used, or has expired.');
+        } else if (new Date(data.expires_at) < new Date()) {
+          setError('This invitation has expired. Please ask the workspace owner to send a new one.');
+        } else {
+          setInviteDetails({
+            workspace_name: (data.workspaces as any)?.name ?? 'Unknown Workspace',
+            inviter_name: (data.inviters as any)?.full_name ?? 'A team member',
+            email: data.invited_email,
+            role: data.invited_role,
+          });
+        }
+        setIsLoading(false);
       });
-      setIsLoading(false);
-    }, 1000);
   }, [token]);
 
   const handleAccept = async () => {
@@ -45,10 +62,18 @@ export const AcceptInvitation = () => {
     setIsAccepting(true);
     setError(null);
 
-    setTimeout(async () => {
-      await refreshWorkspaces();
-      navigate('/app');
-    }, 1000);
+    const { data, error: fnErr } = await supabase.functions.invoke('invite-accept', {
+      body: { token },
+    });
+
+    if (fnErr) {
+      setError(fnErr.message ?? 'Failed to accept invitation. Please try again.');
+      setIsAccepting(false);
+      return;
+    }
+
+    await refreshWorkspaces();
+    navigate('/app');
   };
 
   const handleSignupAndAccept = async (e: React.FormEvent) => {
@@ -67,14 +92,13 @@ export const AcceptInvitation = () => {
     }
 
     if (needsConfirmation) {
-      setSuccessMsg("Account created! Please check your email to verify your account. Once verified, log in to accept your invitation.");
+      setSuccessMsg("Account created! Please check your email to verify your account. Once verified, log in and visit this invitation link again.");
       setIsAccepting(false);
       return;
     }
 
-    setTimeout(async () => {
-      await handleAccept();
-    }, 1000);
+    // User is now signed in — accept the invitation
+    await handleAccept();
   };
 
   if (isLoading) {
